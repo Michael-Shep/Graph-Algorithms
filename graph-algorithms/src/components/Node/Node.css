@@ -1,6 +1,21 @@
 #node {
   border-radius: 50%;
-  border: 3px solid black;
   background-color: white;
   position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.active-border {
+  border: 5px solid lightgreen;
+}
+
+.standard-border {
+  border: 3px solid black;
+}
+
+#valueText {
+  font-size: 30px;
+  font-weight: 550;
 }

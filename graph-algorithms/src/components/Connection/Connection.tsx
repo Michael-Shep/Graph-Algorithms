@@ -9,15 +9,19 @@ interface ConnectionProps {
 }
 
 const Connection = (connectionProps: ConnectionProps) => {
+  const getNodeCenterPosition = (position: number): number => {
+    return position + Constants.NODE_SIZE / 2;
+  };
+
   const getConnectionLength = (): number => {
     let xCalculation =
-      connectionProps.startNode.getCenterX() -
-      connectionProps.endNode.getCenterX();
+      getNodeCenterPosition(connectionProps.startNode.xPosition) -
+      getNodeCenterPosition(connectionProps.startNode.yPosition);
     xCalculation *= xCalculation;
 
     let yCalculation =
-      connectionProps.startNode.getYPosition() -
-      connectionProps.endNode.getYPosition();
+      getNodeCenterPosition(connectionProps.startNode.yPosition) -
+      getNodeCenterPosition(connectionProps.endNode.yPosition);
     yCalculation *= yCalculation;
 
     return Math.sqrt(xCalculation + yCalculation);
@@ -25,11 +29,11 @@ const Connection = (connectionProps: ConnectionProps) => {
 
   const getLineAngle = () => {
     const yComponent =
-      connectionProps.endNode.getCenterY() -
-      connectionProps.startNode.getCenterY();
+      getNodeCenterPosition(connectionProps.endNode.yPosition) -
+      getNodeCenterPosition(connectionProps.startNode.yPosition);
     const xComponent =
-      connectionProps.endNode.getCenterX() -
-      connectionProps.startNode.getCenterX();
+      getNodeCenterPosition(connectionProps.endNode.xPosition) -
+      getNodeCenterPosition(connectionProps.startNode.xPosition);
     const arcTan = Math.atan2(yComponent, xComponent);
     return (arcTan * 180) / Math.PI;
   };
@@ -37,8 +41,9 @@ const Connection = (connectionProps: ConnectionProps) => {
   const positionStyle = {
     transform: 'rotate(' + getLineAngle() + 'deg)',
     left:
-      connectionProps.startNode.getCenterX() - Constants.CONNECTION_WIDTH / 4,
-    top: connectionProps.startNode.getCenterY(),
+      getNodeCenterPosition(connectionProps.startNode.xPosition) -
+      Constants.CONNECTION_WIDTH / 4,
+    top: getNodeCenterPosition(connectionProps.startNode.yPosition),
     width: getConnectionLength(),
     height: Constants.CONNECTION_WIDTH,
   };

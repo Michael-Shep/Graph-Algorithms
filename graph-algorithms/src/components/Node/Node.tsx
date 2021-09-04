@@ -2,13 +2,29 @@ import React from 'react';
 import './Node.css';
 import Constants from '../../helpers/Constants';
 
-export class NodeData {
+export interface NodeData {
+  xPosition: number;
+  yPosition: number;
+  value: number;
+  active: boolean;
+}
+
+/*export class NodeData {
   private xPosition: number;
   private yPosition: number;
+  private value: number;
+  private active: boolean;
 
-  constructor(xPosition: number, yPosition: number) {
+  constructor(
+    xPosition: number,
+    yPosition: number,
+    value: number,
+    active: boolean = false
+  ) {
     this.xPosition = xPosition;
     this.yPosition = yPosition;
+    this.value = value;
+    this.active = active;
   }
 
   public getCenterX(): number {
@@ -26,7 +42,19 @@ export class NodeData {
   public getYPosition(): number {
     return this.yPosition;
   }
-}
+
+  public getValue(): number {
+    return this.value;
+  }
+
+  public isActive(): boolean {
+    return this.active;
+  }
+
+  public setActive(active: boolean) {
+    this.active = active;
+  }
+}*/
 
 interface NodeProps {
   nodeData: NodeData;
@@ -34,13 +62,21 @@ interface NodeProps {
 
 const Node = (props: NodeProps) => {
   const positionStyle = {
-    left: props.nodeData.getXPosition(),
-    top: props.nodeData.getYPosition(),
+    left: props.nodeData.xPosition,
+    top: props.nodeData.yPosition,
     width: Constants.NODE_SIZE,
     height: Constants.NODE_SIZE,
   };
 
-  return <div id="node" style={positionStyle}></div>;
+  return (
+    <div
+      id="node"
+      className={props.nodeData.active ? 'active-border' : 'standard-border'}
+      style={positionStyle}
+    >
+      <span id="valueText">{props.nodeData.value}</span>
+    </div>
+  );
 };
 
 export default Node;
