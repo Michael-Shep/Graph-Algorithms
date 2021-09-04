@@ -10,18 +10,32 @@ interface AppProps {
 }
 
 const App = (props: AppProps) => {
-  const buttonPressHandler = () => {
+  const runButtonHandler = () => {
     store.dispatch({ type: 'FLIP-ACTIVE', nodeIndex: 1 });
     store.dispatch({ type: 'FLIP-ACTIVE', nodeIndex: 0 });
   };
 
+  const addButtonHandler = () => {
+    store.dispatch({ type: 'ADD-NODE' });
+  };
+
   return (
     <div id="app">
-      <h1>Graph Algorithm Visualiser</h1>
-      <button onClick={buttonPressHandler}>Press to update state</button>
-      <Connection startNode={props.nodes[0]} endNode={props.nodes[1]} />
-      <Node nodeData={props.nodes[0]} />
-      <Node nodeData={props.nodes[1]} />
+      <div id="header">
+        <h1>Graph Algorithm Visualiser</h1>
+      </div>
+      <div id="body">
+        <button onClick={addButtonHandler} className="buttonStyle">
+          Add Node
+        </button>
+        <button onClick={runButtonHandler} className="buttonStyle">
+          Run Algorithm
+        </button>
+        <Connection startNode={props.nodes[0]} endNode={props.nodes[1]} />
+        {props.nodes.map((nodeData, index) => (
+          <Node nodeData={nodeData} key={index} />
+        ))}
+      </div>
     </div>
   );
 };
