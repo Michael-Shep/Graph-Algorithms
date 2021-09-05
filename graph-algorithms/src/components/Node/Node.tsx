@@ -6,7 +6,7 @@ export interface NodeData {
   xPosition: number;
   yPosition: number;
   value: number;
-  active: boolean;
+  selected: boolean;
 }
 
 interface NodeProps {
@@ -24,7 +24,7 @@ const Node = (props: NodeProps) => {
   return (
     <div
       id="node"
-      className={props.nodeData.active ? 'active-border' : 'standard-border'}
+      className={props.nodeData.selected ? 'active-border' : 'standard-border'}
       style={positionStyle}
     >
       <span id="valueText">{props.nodeData.value}</span>

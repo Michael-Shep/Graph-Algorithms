@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 import './App.css';
 import Node, { NodeData } from '../Node/Node';
@@ -10,9 +10,25 @@ interface AppProps {
 }
 
 const App = (props: AppProps) => {
+  useEffect(() => {
+    document.addEventListener('mousemove', (mouseEvent) => {
+      store.dispatch({
+        type: 'MOVE-NODE',
+        xPosition: mouseEvent.pageX,
+        yPosition: mouseEvent.pageY,
+      });
+    });
+    document.addEventListener('click', (clickEvent) => {
+      store.dispatch({
+        type: 'SELECT-NODE',
+        xPosition: clickEvent.pageX,
+        yPosition: clickEvent.pageY,
+      });
+    });
+  }, []);
+
   const runButtonHandler = () => {
-    store.dispatch({ type: 'FLIP-ACTIVE', nodeIndex: 1 });
-    store.dispatch({ type: 'FLIP-ACTIVE', nodeIndex: 0 });
+    console.log('RUN ALGORITHM');
   };
 
   const addButtonHandler = () => {

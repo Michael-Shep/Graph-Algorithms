@@ -18,4 +18,5 @@
 #valueText {
   font-size: 30px;
   font-weight: 550;
+  user-select: none;
 }

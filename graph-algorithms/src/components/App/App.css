@@ -3,6 +3,7 @@
   height: 100vh;
   background-color: blue;
   text-align: center;
+  cursor: pointer;
 }
 
 #header {
