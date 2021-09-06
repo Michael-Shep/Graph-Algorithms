@@ -4,6 +4,7 @@ import Constants from './Constants';
 
 export interface NodeState {
   nodes: NodeData[];
+  connectionIndexes: number[][];
 }
 
 export interface NodeAction {
@@ -11,15 +12,18 @@ export interface NodeAction {
   nodeIndex?: number;
   xPosition?: number;
   yPosition?: number;
+  startNodeIndex?: number;
+  endNodeIndex?: number;
 }
 
 let currentSelectedNodeIndex: number = -1;
 
 const initialState: NodeState = {
   nodes: [
-    { xPosition: 100, yPosition: 200, value: 1, selected: false },
-    { xPosition: 200, yPosition: 300, value: 2, selected: false },
+    { xPosition: 100, yPosition: 500, value: 1, selected: false },
+    { xPosition: 200, yPosition: 600, value: 2, selected: false },
   ],
+  connectionIndexes: [],
 };
 
 const handleSelectNode = (state: NodeState, action: NodeAction): NodeState => {
@@ -54,6 +58,7 @@ const handleSelectNode = (state: NodeState, action: NodeAction): NodeState => {
         },
         ...state.nodes.slice(selectedIndex + 1),
       ],
+      connectionIndexes: state.connectionIndexes,
     };
   }
 
@@ -70,6 +75,7 @@ const handleAddNode = (state: NodeState): NodeState => {
         selected: false,
       },
     ]),
+    connectionIndexes: state.connectionIndexes,
   };
 };
 
@@ -92,6 +98,26 @@ const handleMoveNode = (state: NodeState, action: NodeAction): NodeState => {
       },
       ...state.nodes.slice(currentSelectedNodeIndex + 1),
     ],
+    connectionIndexes: state.connectionIndexes,
+  };
+};
+
+const handleAddConnection = (
+  state: NodeState,
+  action: NodeAction
+): NodeState => {
+  if (
+    action.startNodeIndex === undefined ||
+    action.endNodeIndex === undefined
+  ) {
+    return state;
+  }
+  console.log('Returning New Connection');
+  return {
+    nodes: state.nodes,
+    connectionIndexes: state.connectionIndexes.concat([
+      [action.startNodeIndex!, action.endNodeIndex!],
+    ]),
   };
 };
 
@@ -106,6 +132,8 @@ const reducer = (
       return handleAddNode(state);
     case 'MOVE-NODE':
       return handleMoveNode(state, action);
+    case 'ADD-CONNECTION':
+      return handleAddConnection(state, action);
     default:
       return state;
   }
