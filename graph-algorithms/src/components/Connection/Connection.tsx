@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { NodeData } from '../Node/Node';
 import './Connection.css';
 import Constants from '../../helpers/Constants';
@@ -13,10 +13,6 @@ interface ConnectionProps {
 }
 
 const Connection = (connectionProps: ConnectionProps) => {
-  useEffect(() => {
-    console.log('Redrawing Connection');
-  });
-
   const getNodeCenterPosition = (position: number): number => {
     return position + Constants.NODE_SIZE / 2;
   };

@@ -5,6 +5,7 @@ import Constants from './Constants';
 export interface NodeState {
   nodes: NodeData[];
   connectionIndexes: number[][];
+  selectedNodeIndex: number;
 }
 
 export interface NodeAction {
@@ -16,14 +17,13 @@ export interface NodeAction {
   endNodeIndex?: number;
 }
 
-let currentSelectedNodeIndex: number = -1;
-
 const initialState: NodeState = {
   nodes: [
     { xPosition: 100, yPosition: 500, value: 1, selected: false },
     { xPosition: 200, yPosition: 600, value: 2, selected: false },
   ],
   connectionIndexes: [],
+  selectedNodeIndex: -1,
 };
 
 const handleSelectNode = (state: NodeState, action: NodeAction): NodeState => {
@@ -32,6 +32,7 @@ const handleSelectNode = (state: NodeState, action: NodeAction): NodeState => {
   }
 
   let selectedIndex = -1;
+  let selectedNodeIndex = -1;
   state.nodes.forEach((node, index) => {
     if (
       node.xPosition <= action.xPosition! &&
@@ -40,10 +41,10 @@ const handleSelectNode = (state: NodeState, action: NodeAction): NodeState => {
       node.yPosition + Constants.NODE_SIZE >= action.yPosition!
     ) {
       selectedIndex = index;
-      if (currentSelectedNodeIndex === -1) {
-        currentSelectedNodeIndex = index;
+      if (state.selectedNodeIndex === -1) {
+        selectedNodeIndex = index;
       } else {
-        currentSelectedNodeIndex = -1;
+        selectedNodeIndex = -1;
       }
     }
   });
@@ -59,6 +60,7 @@ const handleSelectNode = (state: NodeState, action: NodeAction): NodeState => {
         ...state.nodes.slice(selectedIndex + 1),
       ],
       connectionIndexes: state.connectionIndexes,
+      selectedNodeIndex: selectedNodeIndex,
     };
   }
 
@@ -76,12 +78,13 @@ const handleAddNode = (state: NodeState): NodeState => {
       },
     ]),
     connectionIndexes: state.connectionIndexes,
+    selectedNodeIndex: state.selectedNodeIndex,
   };
 };
 
 const handleMoveNode = (state: NodeState, action: NodeAction): NodeState => {
   if (
-    currentSelectedNodeIndex === -1 ||
+    state.selectedNodeIndex === -1 ||
     action.xPosition === undefined ||
     action.yPosition === undefined
   ) {
@@ -90,15 +93,16 @@ const handleMoveNode = (state: NodeState, action: NodeAction): NodeState => {
 
   return {
     nodes: [
-      ...state.nodes.slice(0, currentSelectedNodeIndex),
+      ...state.nodes.slice(0, state.selectedNodeIndex),
       {
-        ...state.nodes[currentSelectedNodeIndex],
+        ...state.nodes[state.selectedNodeIndex],
         xPosition: action.xPosition - Constants.NODE_SIZE / 2,
         yPosition: action.yPosition - Constants.NODE_SIZE / 2,
       },
-      ...state.nodes.slice(currentSelectedNodeIndex + 1),
+      ...state.nodes.slice(state.selectedNodeIndex + 1),
     ],
     connectionIndexes: state.connectionIndexes,
+    selectedNodeIndex: state.selectedNodeIndex,
   };
 };
 
@@ -112,12 +116,12 @@ const handleAddConnection = (
   ) {
     return state;
   }
-  console.log('Returning New Connection');
   return {
     nodes: state.nodes,
     connectionIndexes: state.connectionIndexes.concat([
       [action.startNodeIndex!, action.endNodeIndex!],
     ]),
+    selectedNodeIndex: state.selectedNodeIndex,
   };
 };
 

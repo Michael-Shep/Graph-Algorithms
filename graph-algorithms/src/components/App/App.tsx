@@ -1,10 +1,11 @@
-import React, { useState, useEffect, MouseEvent } from 'react';
+import React, { useState, useEffect, MouseEvent, useRef } from 'react';
 import { connect } from 'react-redux';
 import './App.css';
 import Node, { NodeData } from '../Node/Node';
 import Connection, { ConnectionData } from '../Connection/Connection';
 import store, { NodeState } from '../../helpers/ReduxStore';
 import Constants from '../../helpers/Constants';
+import InformationPanel from '../InformationPanel/InformationPanel';
 
 interface AppProps {
   nodes: NodeData[];
@@ -17,6 +18,8 @@ enum InteractionMode {
 }
 
 const App = (props: AppProps) => {
+  const graphDisplay = useRef<HTMLDivElement>(null);
+
   const [interactionMode, setInteractionMode] = useState<InteractionMode>(
     InteractionMode.NODE
   );
@@ -31,11 +34,23 @@ const App = (props: AppProps) => {
 
   useEffect(() => {
     document.addEventListener('mousemove', (mouseEvent) => {
-      store.dispatch({
-        type: 'MOVE-NODE',
-        xPosition: mouseEvent.pageX,
-        yPosition: mouseEvent.pageY,
-      });
+      const element = graphDisplay.current;
+      if (
+        element !== null &&
+        mouseEvent.pageX - Constants.NODE_SIZE >= element!.clientLeft &&
+        mouseEvent.pageX + Constants.NODE_SIZE <=
+          element!.offsetLeft + element!.clientWidth &&
+        mouseEvent.pageY - Constants.NODE_SIZE >= element!.clientTop &&
+        mouseEvent.pageY + Constants.NODE_SIZE <=
+          element!.offsetTop + element!.clientHeight
+      ) {
+        console.log('Code Working');
+        store.dispatch({
+          type: 'MOVE-NODE',
+          xPosition: mouseEvent.pageX,
+          yPosition: mouseEvent.pageY,
+        });
+      }
     });
   }, []);
 
@@ -104,33 +119,36 @@ const App = (props: AppProps) => {
       <div id="header">
         <h1>Graph Algorithm Visualiser</h1>
       </div>
-      <div id="body" onClick={clickHandler}>
-        <button onClick={addButtonHandler} className="buttonStyle">
-          Add Node
-        </button>
-        <button onClick={runButtonHandler} className="buttonStyle">
-          Run Algorithm
-        </button>
-        <button onClick={modeButtonHandler} className="buttonStyle">
-          {modeButtonText}
-        </button>
-        <p id="informationText">{informationText}</p>
-        {props.connectionIndexes.map((connectionNodes, index) => {
-          if (
-            connectionNodes.length === 2 &&
-            isValidNodeIndex(connectionNodes[0]) &&
-            isValidNodeIndex(connectionNodes[1])
-          ) {
-            const data: ConnectionData = {
-              startNode: props.nodes[connectionNodes[0]],
-              endNode: props.nodes[connectionNodes[1]],
-            };
-            return <Connection data={data} key={index + 'C'} />;
-          }
-        })}
-        {props.nodes.map((nodeData, index) => (
-          <Node nodeData={nodeData} key={index} />
-        ))}
+      <div id="body">
+        <div id="graphDisplay" onClick={clickHandler} ref={graphDisplay}>
+          <button onClick={addButtonHandler} className="buttonStyle">
+            Add Node
+          </button>
+          <button onClick={runButtonHandler} className="buttonStyle">
+            Run Algorithm
+          </button>
+          <button onClick={modeButtonHandler} className="buttonStyle">
+            {modeButtonText}
+          </button>
+          <p id="informationText">{informationText}</p>
+          {props.connectionIndexes.map((connectionNodes, index) => {
+            if (
+              connectionNodes.length === 2 &&
+              isValidNodeIndex(connectionNodes[0]) &&
+              isValidNodeIndex(connectionNodes[1])
+            ) {
+              const data: ConnectionData = {
+                startNode: props.nodes[connectionNodes[0]],
+                endNode: props.nodes[connectionNodes[1]],
+              };
+              return <Connection data={data} key={index + 'C'} />;
+            }
+          })}
+          {props.nodes.map((nodeData, index) => (
+            <Node nodeData={nodeData} key={index} />
+          ))}
+        </div>
+        <InformationPanel />
       </div>
     </div>
   );
