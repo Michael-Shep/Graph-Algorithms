@@ -27,44 +27,35 @@ const initialState: NodeState = {
 };
 
 const handleSelectNode = (state: NodeState, action: NodeAction): NodeState => {
-  if (action.xPosition === undefined || action.yPosition === undefined) {
+  if (
+    action.nodeIndex === undefined ||
+    action.nodeIndex <= -1 ||
+    action.nodeIndex >= state.nodes.length ||
+    action.nodeIndex === state.selectedNodeIndex
+  ) {
     return state;
   }
 
-  let selectedIndex = -1;
-  let selectedNodeIndex = -1;
-  state.nodes.forEach((node, index) => {
-    if (
-      node.xPosition <= action.xPosition! &&
-      node.xPosition + Constants.NODE_SIZE >= action.xPosition! &&
-      node.yPosition <= action.yPosition! &&
-      node.yPosition + Constants.NODE_SIZE >= action.yPosition!
-    ) {
-      selectedIndex = index;
-      if (state.selectedNodeIndex === -1) {
-        selectedNodeIndex = index;
-      } else {
-        selectedNodeIndex = -1;
-      }
-    }
-  });
+  const newlySelected = !state.nodes[action.nodeIndex!].selected;
+  const newNodes = [
+    ...state.nodes.slice(0, action.nodeIndex!),
+    {
+      ...state.nodes[action.nodeIndex!],
+      selected: !state.nodes[action.nodeIndex!].selected,
+    },
+    ...state.nodes.slice(action.nodeIndex! + 1),
+  ];
 
-  if (selectedIndex !== -1) {
-    return {
-      nodes: [
-        ...state.nodes.slice(0, selectedIndex),
-        {
-          ...state.nodes[selectedIndex],
-          selected: !state.nodes[selectedIndex].selected,
-        },
-        ...state.nodes.slice(selectedIndex + 1),
-      ],
-      connectionIndexes: state.connectionIndexes,
-      selectedNodeIndex: selectedNodeIndex,
-    };
+  //Clear the previously selected node
+  if (newlySelected && state.selectedNodeIndex !== -1) {
+    newNodes[state.selectedNodeIndex].selected = false;
   }
 
-  return state;
+  return {
+    nodes: newNodes,
+    connectionIndexes: state.connectionIndexes,
+    selectedNodeIndex: newlySelected ? action.nodeIndex : -1,
+  };
 };
 
 const handleAddNode = (state: NodeState): NodeState => {

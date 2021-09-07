@@ -10,6 +10,7 @@ import InformationPanel from '../InformationPanel/InformationPanel';
 interface AppProps {
   nodes: NodeData[];
   connectionIndexes: number[][];
+  selectedNodeIndex: number;
 }
 
 enum InteractionMode {
@@ -32,27 +33,7 @@ const App = (props: AppProps) => {
   const [firstSelectedNodeIndex, setFirstSelectedNodeIndex] =
     useState<number>(-1);
 
-  useEffect(() => {
-    document.addEventListener('mousemove', (mouseEvent) => {
-      const element = graphDisplay.current;
-      if (
-        element !== null &&
-        mouseEvent.pageX - Constants.NODE_SIZE >= element!.clientLeft &&
-        mouseEvent.pageX + Constants.NODE_SIZE <=
-          element!.offsetLeft + element!.clientWidth &&
-        mouseEvent.pageY - Constants.NODE_SIZE >= element!.clientTop &&
-        mouseEvent.pageY + Constants.NODE_SIZE <=
-          element!.offsetTop + element!.clientHeight
-      ) {
-        console.log('Code Working');
-        store.dispatch({
-          type: 'MOVE-NODE',
-          xPosition: mouseEvent.pageX,
-          yPosition: mouseEvent.pageY,
-        });
-      }
-    });
-  }, []);
+  const [isMouseOnNode, setIsMouseOnNode] = useState(false);
 
   useEffect(() => {
     if (interactionMode === InteractionMode.NODE) {
@@ -64,21 +45,43 @@ const App = (props: AppProps) => {
     }
   }, [interactionMode]);
 
-  const clickHandler = (clickEvent: MouseEvent<HTMLDivElement>) => {
-    if (interactionMode === InteractionMode.NODE) {
+  const handleMouseMove = (mouseEvent: MouseEvent) => {
+    if (isMouseOnNode) {
       store.dispatch({
-        type: 'SELECT-NODE',
-        xPosition: clickEvent.pageX,
-        yPosition: clickEvent.pageY,
+        type: 'MOVE-NODE',
+        xPosition: mouseEvent.pageX,
+        yPosition: mouseEvent.pageY,
+      });
+    }
+  };
+
+  const isMouseInNodeBounds = (
+    node: NodeData,
+    clickX: number,
+    clickY: number
+  ): boolean => {
+    return (
+      node.xPosition <= clickX &&
+      node.xPosition + Constants.NODE_SIZE >= clickX &&
+      node.yPosition <= clickY &&
+      node.yPosition + Constants.NODE_SIZE >= clickY
+    );
+  };
+
+  const mouseDownHandler = (clickEvent: MouseEvent) => {
+    if (interactionMode === InteractionMode.NODE) {
+      props.nodes.forEach((node, index) => {
+        if (isMouseInNodeBounds(node, clickEvent.pageX, clickEvent.pageY)) {
+          setIsMouseOnNode(true);
+          store.dispatch({
+            type: 'SELECT-NODE',
+            nodeIndex: index,
+          });
+        }
       });
     } else {
       props.nodes.forEach((node, index) => {
-        if (
-          node.xPosition <= clickEvent.pageX &&
-          node.xPosition + Constants.NODE_SIZE >= clickEvent.pageX &&
-          node.yPosition <= clickEvent.pageY &&
-          node.yPosition + Constants.NODE_SIZE >= clickEvent.pageY
-        ) {
+        if (isMouseInNodeBounds(node, clickEvent.pageX, clickEvent.pageY)) {
           if (firstSelectedNodeIndex === -1) {
             setInformationText('Now Select End node for connection');
             setFirstSelectedNodeIndex(index);
@@ -120,7 +123,13 @@ const App = (props: AppProps) => {
         <h1>Graph Algorithm Visualiser</h1>
       </div>
       <div id="body">
-        <div id="graphDisplay" onClick={clickHandler} ref={graphDisplay}>
+        <div
+          id="graphDisplay"
+          onMouseMove={handleMouseMove}
+          onMouseDown={mouseDownHandler}
+          onMouseUp={() => setIsMouseOnNode(false)}
+          ref={graphDisplay}
+        >
           <button onClick={addButtonHandler} className="buttonStyle">
             Add Node
           </button>
@@ -157,6 +166,7 @@ const App = (props: AppProps) => {
 const mapStateToProps = (state: NodeState) => ({
   nodes: state.nodes,
   connectionIndexes: state.connectionIndexes,
+  selectedNodeIndex: state.selectedNodeIndex,
 });
 
 export default connect(mapStateToProps)(App);
