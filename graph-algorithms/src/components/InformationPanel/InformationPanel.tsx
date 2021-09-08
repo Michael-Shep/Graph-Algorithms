@@ -6,7 +6,7 @@ import store, { NodeState } from '../../helpers/ReduxStore';
 
 interface InformationPanelProps {
   nodes: NodeData[];
-  connectionIndexes: number[][];
+  connectionsData: number[][];
   selectedNodeIndex: number;
 }
 
@@ -35,7 +35,7 @@ const InformationPanel = (props: InformationPanelProps) => {
   };
 
   const listConnectionsForNode = () => {
-    const nodeConnections = props.connectionIndexes.filter(
+    const nodeConnections = props.connectionsData.filter(
       doesConnectionInvolveSelectedNode
     );
 
@@ -50,7 +50,8 @@ const InformationPanel = (props: InformationPanelProps) => {
           : connection[0];
       return (
         <p key={index} className="leftAligned">
-          {index + 1}: Node with value {props.nodes[otherNodeIndex].value}
+          {index + 1}: Node with value {props.nodes[otherNodeIndex].value},
+          Connection Weight: {connection[2]}
         </p>
       );
     });
@@ -88,7 +89,7 @@ const InformationPanel = (props: InformationPanelProps) => {
 
 const mapStateToProps = (state: NodeState) => ({
   nodes: state.nodes,
-  connectionIndexes: state.connectionIndexes,
+  connectionsData: state.connectionsData,
   selectedNodeIndex: state.selectedNodeIndex,
 });
 

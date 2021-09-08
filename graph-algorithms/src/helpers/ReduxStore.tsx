@@ -4,7 +4,7 @@ import Constants from './Constants';
 
 export interface NodeState {
   nodes: NodeData[];
-  connectionIndexes: number[][];
+  connectionsData: number[][];
   selectedNodeIndex: number;
 }
 
@@ -23,7 +23,7 @@ const initialState: NodeState = {
     { xPosition: 100, yPosition: 500, value: '1', selected: false },
     { xPosition: 200, yPosition: 600, value: '2', selected: false },
   ],
-  connectionIndexes: [],
+  connectionsData: [],
   selectedNodeIndex: -1,
 };
 
@@ -54,7 +54,7 @@ const handleSelectNode = (state: NodeState, action: NodeAction): NodeState => {
 
   return {
     nodes: newNodes,
-    connectionIndexes: state.connectionIndexes,
+    connectionsData: state.connectionsData,
     selectedNodeIndex: newlySelected ? action.nodeIndex : -1,
   };
 };
@@ -69,7 +69,7 @@ const handleAddNode = (state: NodeState): NodeState => {
         selected: false,
       },
     ]),
-    connectionIndexes: state.connectionIndexes,
+    connectionsData: state.connectionsData,
     selectedNodeIndex: state.selectedNodeIndex,
   };
 };
@@ -93,7 +93,7 @@ const handleMoveNode = (state: NodeState, action: NodeAction): NodeState => {
       },
       ...state.nodes.slice(state.selectedNodeIndex + 1),
     ],
-    connectionIndexes: state.connectionIndexes,
+    connectionsData: state.connectionsData,
     selectedNodeIndex: state.selectedNodeIndex,
   };
 };
@@ -115,11 +115,9 @@ const handleUpdateNodeValue = (
       },
       ...state.nodes.slice(state.selectedNodeIndex + 1),
     ],
-    connectionIndexes: state.connectionIndexes,
+    connectionsData: state.connectionsData,
     selectedNodeIndex: state.selectedNodeIndex,
   };
-
-  return state;
 };
 
 const handleAddConnection = (
@@ -134,8 +132,8 @@ const handleAddConnection = (
   }
   return {
     nodes: state.nodes,
-    connectionIndexes: state.connectionIndexes.concat([
-      [action.startNodeIndex!, action.endNodeIndex!],
+    connectionsData: state.connectionsData.concat([
+      [action.startNodeIndex!, action.endNodeIndex!, 0],
     ]),
     selectedNodeIndex: state.selectedNodeIndex,
   };

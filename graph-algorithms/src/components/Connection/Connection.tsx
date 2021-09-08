@@ -6,6 +6,7 @@ import Constants from '../../helpers/Constants';
 export interface ConnectionData {
   startNode: NodeData;
   endNode: NodeData;
+  weight: number;
 }
 
 interface ConnectionProps {
@@ -52,7 +53,11 @@ const Connection = (connectionProps: ConnectionProps) => {
     height: Constants.CONNECTION_WIDTH,
   };
 
-  return <div id="connection" style={positionStyle}></div>;
+  return (
+    <div id="connection" style={positionStyle}>
+      <span id="weightDisplay">{connectionProps.data.weight}</span>
+    </div>
+  );
 };
 
 export default Connection;

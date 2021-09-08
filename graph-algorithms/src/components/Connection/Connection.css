@@ -2,4 +2,13 @@
   background-color: black;
   position: absolute;
   transform-origin: 0 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#weightDisplay {
+  font-weight: bold;
+  color: white;
+  font-size: 24px;
 }

@@ -9,7 +9,7 @@ import InformationPanel from '../InformationPanel/InformationPanel';
 
 interface AppProps {
   nodes: NodeData[];
-  connectionIndexes: number[][];
+  connectionsData: number[][];
   selectedNodeIndex: number;
 }
 
@@ -140,15 +140,16 @@ const App = (props: AppProps) => {
             {modeButtonText}
           </button>
           <p id="informationText">{informationText}</p>
-          {props.connectionIndexes.map((connectionNodes, index) => {
+          {props.connectionsData.map((connectionData, index) => {
             if (
-              connectionNodes.length === 2 &&
-              isValidNodeIndex(connectionNodes[0]) &&
-              isValidNodeIndex(connectionNodes[1])
+              connectionData.length === 3 &&
+              isValidNodeIndex(connectionData[0]) &&
+              isValidNodeIndex(connectionData[1])
             ) {
               const data: ConnectionData = {
-                startNode: props.nodes[connectionNodes[0]],
-                endNode: props.nodes[connectionNodes[1]],
+                startNode: props.nodes[connectionData[0]],
+                endNode: props.nodes[connectionData[1]],
+                weight: connectionData[2],
               };
               return <Connection data={data} key={index + 'C'} />;
             }
@@ -165,7 +166,7 @@ const App = (props: AppProps) => {
 
 const mapStateToProps = (state: NodeState) => ({
   nodes: state.nodes,
-  connectionIndexes: state.connectionIndexes,
+  connectionsData: state.connectionsData,
   selectedNodeIndex: state.selectedNodeIndex,
 });
 
