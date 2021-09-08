@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ChangeEvent } from 'react';
 import './InformationPanel.css';
 import { NodeData } from '../Node/Node';
 import { connect } from 'react-redux';
@@ -18,6 +18,15 @@ const InformationPanel = (props: InformationPanelProps) => {
     }
   };
 
+  const handleValueChange = (event: ChangeEvent<HTMLInputElement>) => {
+    if (event.target.value !== undefined) {
+      store.dispatch({
+        type: 'UPDATE-NODE-VALUE',
+        newValue: event.target.value!,
+      });
+    }
+  };
+
   const getBody = () => {
     if (props.selectedNodeIndex === -1) {
       return <div> Select a node to view and modify its information here</div>;
@@ -25,7 +34,15 @@ const InformationPanel = (props: InformationPanelProps) => {
 
     return (
       <div>
-        <p>Value: {props.nodes[props.selectedNodeIndex].value}</p>
+        <form>
+          <label className="formLabel">Value:</label>
+          <input
+            className="formInput"
+            type="text"
+            value={props.nodes[props.selectedNodeIndex].value}
+            onChange={handleValueChange}
+          />
+        </form>
       </div>
     );
   };

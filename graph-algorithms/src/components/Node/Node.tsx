@@ -5,7 +5,7 @@ import Constants from '../../helpers/Constants';
 export interface NodeData {
   xPosition: number;
   yPosition: number;
-  value: number;
+  value: string;
   selected: boolean;
 }
 

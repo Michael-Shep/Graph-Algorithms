@@ -5,3 +5,23 @@
   border: 2px solid black;
   padding: 20px;
 }
+
+.formLabel {
+  margin-right: 10px;
+  font-size: 20px;
+}
+
+.formInput {
+  background-color: gray;
+  border: none;
+  font-size: 20px;
+  font-weight: bolder;
+  border-bottom: 2px solid black;
+  width: 30%;
+  text-align: center;
+}
+
+.formInput:focus {
+  outline: none;
+  border-bottom: 2px solid blue;
+}

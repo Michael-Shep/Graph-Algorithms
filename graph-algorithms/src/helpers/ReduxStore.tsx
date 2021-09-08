@@ -15,12 +15,13 @@ export interface NodeAction {
   yPosition?: number;
   startNodeIndex?: number;
   endNodeIndex?: number;
+  newValue?: string;
 }
 
 const initialState: NodeState = {
   nodes: [
-    { xPosition: 100, yPosition: 500, value: 1, selected: false },
-    { xPosition: 200, yPosition: 600, value: 2, selected: false },
+    { xPosition: 100, yPosition: 500, value: '1', selected: false },
+    { xPosition: 200, yPosition: 600, value: '2', selected: false },
   ],
   connectionIndexes: [],
   selectedNodeIndex: -1,
@@ -64,7 +65,7 @@ const handleAddNode = (state: NodeState): NodeState => {
       {
         xPosition: Constants.NEW_NODE_X_POSITION,
         yPosition: Constants.NEW_NODE_Y_POSITION,
-        value: 0,
+        value: '0',
         selected: false,
       },
     ]),
@@ -97,6 +98,30 @@ const handleMoveNode = (state: NodeState, action: NodeAction): NodeState => {
   };
 };
 
+const handleUpdateNodeValue = (
+  state: NodeState,
+  action: NodeAction
+): NodeState => {
+  if (state.selectedNodeIndex === -1 || action.newValue === undefined) {
+    return state;
+  }
+
+  return {
+    nodes: [
+      ...state.nodes.slice(0, state.selectedNodeIndex),
+      {
+        ...state.nodes[state.selectedNodeIndex],
+        value: action.newValue!,
+      },
+      ...state.nodes.slice(state.selectedNodeIndex + 1),
+    ],
+    connectionIndexes: state.connectionIndexes,
+    selectedNodeIndex: state.selectedNodeIndex,
+  };
+
+  return state;
+};
+
 const handleAddConnection = (
   state: NodeState,
   action: NodeAction
@@ -127,6 +152,8 @@ const reducer = (
       return handleAddNode(state);
     case 'MOVE-NODE':
       return handleMoveNode(state, action);
+    case 'UPDATE-NODE-VALUE':
+      return handleUpdateNodeValue(state, action);
     case 'ADD-CONNECTION':
       return handleAddConnection(state, action);
     default:
