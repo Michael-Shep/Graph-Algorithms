@@ -11,6 +11,19 @@
   font-size: 20px;
 }
 
+.formSubheading {
+  text-align: left;
+  font-weight: bolder;
+  font-size: 22px;
+  padding-left: 20px;
+  margin-top: 20px;
+}
+
+.leftAligned {
+  text-align: left;
+  padding-left: 20px;
+}
+
 .formInput {
   background-color: gray;
   border: none;
