@@ -1,4 +1,4 @@
-import React, { ChangeEvent } from 'react';
+import React, { ChangeEvent, MouseEvent } from 'react';
 import './InformationPanel.css';
 import { NodeData } from '../Node/Node';
 import { connect } from 'react-redux';
@@ -57,6 +57,11 @@ const InformationPanel = (props: InformationPanelProps) => {
     });
   };
 
+  const deleteButtonHandler = (event: MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    store.dispatch({ type: 'DELETE-NODE' });
+  };
+
   const getBody = () => {
     if (props.selectedNodeIndex === -1) {
       return <div> Select a node to view and modify its information here</div>;
@@ -74,6 +79,9 @@ const InformationPanel = (props: InformationPanelProps) => {
           />
           <p className="formSubheading">Connections:</p>
           {listConnectionsForNode()}
+          <button className="formButtonStyle" onClick={deleteButtonHandler}>
+            Delete Node
+          </button>
         </form>
       </div>
     );

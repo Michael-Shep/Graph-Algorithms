@@ -1,18 +1,19 @@
 #app {
   width: 100vw;
   height: 100vh;
-  background-color: blue;
+  background-color: gray;
   text-align: center;
   cursor: pointer;
 }
 
 #header {
-  width: 100%;
+  width: calc(100% - 6px);
   height: 100px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: red;
+  background-color: white;
+  border: 3px solid black;
 }
 
 #body {
@@ -24,8 +25,9 @@
 
 #graphDisplay {
   padding: 20px;
-  height: 100%;
+  height: calc(100% - 6px);
   width: 70%;
+  border: 3px solid black;
 }
 
 .buttonStyle {

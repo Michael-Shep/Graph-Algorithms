@@ -139,6 +139,27 @@ const handleAddConnection = (
   };
 };
 
+const getConnectionsWithoutSelectedNode = (state: NodeState): number[][] => {
+  return state.connectionsData.filter(
+    (connection) => !connection.includes(state.selectedNodeIndex)
+  );
+};
+
+const handleDeleteNode = (state: NodeState): NodeState => {
+  if (state.selectedNodeIndex === -1) {
+    return state;
+  }
+
+  return {
+    nodes: [
+      ...state.nodes.slice(0, state.selectedNodeIndex),
+      ...state.nodes.slice(state.selectedNodeIndex + 1),
+    ],
+    connectionsData: getConnectionsWithoutSelectedNode(state),
+    selectedNodeIndex: -1,
+  };
+};
+
 const reducer = (
   state: NodeState = initialState,
   action: NodeAction
@@ -152,6 +173,8 @@ const reducer = (
       return handleMoveNode(state, action);
     case 'UPDATE-NODE-VALUE':
       return handleUpdateNodeValue(state, action);
+    case 'DELETE-NODE':
+      return handleDeleteNode(state);
     case 'ADD-CONNECTION':
       return handleAddConnection(state, action);
     default:
