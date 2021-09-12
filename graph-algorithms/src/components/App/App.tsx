@@ -2,33 +2,39 @@ import React, { useState, useEffect, MouseEvent, useRef } from 'react';
 import { connect } from 'react-redux';
 import './App.css';
 import Node, { NodeData } from '../Node/Node';
-import Connection, { ConnectionData } from '../Connection/Connection';
-import store, { NodeState } from '../../helpers/ReduxStore';
+import Connection, {
+  ConnectionData,
+  checkIfPointOnConnectionLine,
+} from '../Connection/Connection';
+import store, {
+  ConnectionIndexData,
+  NodeState,
+} from '../../helpers/ReduxStore';
 import Constants from '../../helpers/Constants';
 import InformationPanel from '../InformationPanel/InformationPanel';
 
 interface AppProps {
   nodes: NodeData[];
-  connectionsData: number[][];
+  connectionsData: ConnectionIndexData[];
   selectedNodeIndex: number;
 }
 
 enum InteractionMode {
-  NODE,
-  CONNECTION,
+  SELECTION,
+  NEW_CONNECTION,
 }
 
 const App = (props: AppProps) => {
   const graphDisplay = useRef<HTMLDivElement>(null);
 
   const [interactionMode, setInteractionMode] = useState<InteractionMode>(
-    InteractionMode.NODE
+    InteractionMode.SELECTION
   );
   const [informationText, setInformationText] = useState(
-    'Select a node to perform actions on it'
+    Constants.SELECTION_MODE_INFORMATION_TEXT
   );
   const [modeButtonText, setModeButtonText] = useState(
-    'Switch to Connection Mode'
+    Constants.SWITCH_TO_CONNECTION_TEXT
   );
   const [firstSelectedNodeIndex, setFirstSelectedNodeIndex] =
     useState<number>(-1);
@@ -36,12 +42,12 @@ const App = (props: AppProps) => {
   const [isMouseOnNode, setIsMouseOnNode] = useState(false);
 
   useEffect(() => {
-    if (interactionMode === InteractionMode.NODE) {
-      setInformationText('Select a node to perform actions on it');
-      setModeButtonText('Switch to Connection Mode');
-    } else if (interactionMode === InteractionMode.CONNECTION) {
-      setInformationText('Select the start node for the connection');
-      setModeButtonText('Switch to Node Mode');
+    if (interactionMode === InteractionMode.SELECTION) {
+      setInformationText(Constants.SELECTION_MODE_INFORMATION_TEXT);
+      setModeButtonText(Constants.SWITCH_TO_CONNECTION_TEXT);
+    } else if (interactionMode === InteractionMode.NEW_CONNECTION) {
+      setInformationText(Constants.CONNECTION_START_NODE_TEXT);
+      setModeButtonText(Constants.CANCEL_CONNECTION_TEXT);
     }
   }, [interactionMode]);
 
@@ -69,7 +75,8 @@ const App = (props: AppProps) => {
   };
 
   const mouseDownHandler = (clickEvent: MouseEvent) => {
-    if (interactionMode === InteractionMode.NODE) {
+    if (interactionMode === InteractionMode.SELECTION) {
+      let selectionMade = false;
       props.nodes.forEach((node, index) => {
         if (isMouseInNodeBounds(node, clickEvent.pageX, clickEvent.pageY)) {
           setIsMouseOnNode(true);
@@ -77,13 +84,37 @@ const App = (props: AppProps) => {
             type: 'SELECT-NODE',
             nodeIndex: index,
           });
+          selectionMade = true;
+          return;
         }
       });
+      if (!selectionMade) {
+        props.connectionsData.forEach((connectionIndexData, index) => {
+          if (
+            checkIfPointOnConnectionLine(
+              {
+                startNode: props.nodes[connectionIndexData.startNodeIndex],
+                endNode: props.nodes[connectionIndexData.endNodeIndex],
+                weight: connectionIndexData.weight,
+                selected: connectionIndexData.selected,
+              },
+              clickEvent.pageX,
+              clickEvent.pageY
+            )
+          ) {
+            store.dispatch({
+              type: 'SELECT-CONNECTION',
+              connectionIndex: index,
+            });
+            return;
+          }
+        });
+      }
     } else {
       props.nodes.forEach((node, index) => {
         if (isMouseInNodeBounds(node, clickEvent.pageX, clickEvent.pageY)) {
           if (firstSelectedNodeIndex === -1) {
-            setInformationText('Now Select End node for connection');
+            setInformationText(Constants.CONNECTION_END_NODE_TEXT);
             setFirstSelectedNodeIndex(index);
           } else if (index !== firstSelectedNodeIndex) {
             store.dispatch({
@@ -92,7 +123,7 @@ const App = (props: AppProps) => {
               endNodeIndex: index,
             });
             setFirstSelectedNodeIndex(-1);
-            setInformationText('Select the state node for the connection');
+            setInteractionMode(InteractionMode.SELECTION);
           }
         }
       });
@@ -108,9 +139,9 @@ const App = (props: AppProps) => {
   };
 
   const modeButtonHandler = () => {
-    if (interactionMode === InteractionMode.NODE) {
-      setInteractionMode(InteractionMode.CONNECTION);
-    } else setInteractionMode(InteractionMode.NODE);
+    if (interactionMode === InteractionMode.SELECTION) {
+      setInteractionMode(InteractionMode.NEW_CONNECTION);
+    } else setInteractionMode(InteractionMode.SELECTION);
   };
 
   const isValidNodeIndex = (index: number): boolean => {
@@ -133,23 +164,23 @@ const App = (props: AppProps) => {
           <button onClick={addButtonHandler} className="buttonStyle">
             Add Node
           </button>
-          <button onClick={runButtonHandler} className="buttonStyle">
-            Run Algorithm
-          </button>
           <button onClick={modeButtonHandler} className="buttonStyle">
             {modeButtonText}
           </button>
+          <button onClick={runButtonHandler} className="buttonStyle">
+            Run Algorithm
+          </button>
           <p id="informationText">{informationText}</p>
-          {props.connectionsData.map((connectionData, index) => {
+          {props.connectionsData.map((connectionIndexData, index) => {
             if (
-              connectionData.length === 3 &&
-              isValidNodeIndex(connectionData[0]) &&
-              isValidNodeIndex(connectionData[1])
+              isValidNodeIndex(connectionIndexData.startNodeIndex) &&
+              isValidNodeIndex(connectionIndexData.endNodeIndex)
             ) {
               const data: ConnectionData = {
-                startNode: props.nodes[connectionData[0]],
-                endNode: props.nodes[connectionData[1]],
-                weight: connectionData[2],
+                startNode: props.nodes[connectionIndexData.startNodeIndex],
+                endNode: props.nodes[connectionIndexData.endNodeIndex],
+                weight: connectionIndexData.weight,
+                selected: connectionIndexData.selected,
               };
               return <Connection data={data} key={index + 'C'} />;
             }

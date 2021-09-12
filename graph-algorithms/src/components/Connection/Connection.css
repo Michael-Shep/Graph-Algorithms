@@ -1,5 +1,4 @@
 #connection {
-  background-color: black;
   position: absolute;
   transform-origin: 0 100%;
   display: flex;
@@ -11,4 +10,13 @@
   font-weight: bold;
   color: white;
   font-size: 24px;
+  user-select: none;
+}
+
+.selected {
+  background-color: lightgreen;
+}
+
+.not-selected {
+  background-color: black;
 }

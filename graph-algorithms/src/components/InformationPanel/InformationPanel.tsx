@@ -2,11 +2,14 @@ import React, { ChangeEvent, MouseEvent } from 'react';
 import './InformationPanel.css';
 import { NodeData } from '../Node/Node';
 import { connect } from 'react-redux';
-import store, { NodeState } from '../../helpers/ReduxStore';
+import store, {
+  ConnectionIndexData,
+  NodeState,
+} from '../../helpers/ReduxStore';
 
 interface InformationPanelProps {
   nodes: NodeData[];
-  connectionsData: number[][];
+  connectionsData: ConnectionIndexData[];
   selectedNodeIndex: number;
 }
 
@@ -29,9 +32,12 @@ const InformationPanel = (props: InformationPanelProps) => {
   };
 
   const doesConnectionInvolveSelectedNode = (
-    nodeIndexes: number[]
+    connectionIndexData: ConnectionIndexData
   ): boolean => {
-    return nodeIndexes.includes(props.selectedNodeIndex);
+    return (
+      connectionIndexData.startNodeIndex === props.selectedNodeIndex ||
+      connectionIndexData.endNodeIndex === props.selectedNodeIndex
+    );
   };
 
   const listConnectionsForNode = () => {
@@ -45,13 +51,13 @@ const InformationPanel = (props: InformationPanelProps) => {
 
     return nodeConnections.map((connection, index) => {
       const otherNodeIndex =
-        connection[0] === props.selectedNodeIndex
-          ? connection[1]
-          : connection[0];
+        connection.startNodeIndex === props.selectedNodeIndex
+          ? connection.startNodeIndex
+          : connection.endNodeIndex;
       return (
         <p key={index} className="leftAligned">
           {index + 1}: Node with value {props.nodes[otherNodeIndex].value},
-          Connection Weight: {connection[2]}
+          Connection Weight: {connection.weight}
         </p>
       );
     });
@@ -89,7 +95,7 @@ const InformationPanel = (props: InformationPanelProps) => {
 
   return (
     <div id="panel">
-      <h1>{getTitleText()}</h1>
+      <h1 id="heading">{getTitleText()}</h1>
       {getBody()}
     </div>
   );

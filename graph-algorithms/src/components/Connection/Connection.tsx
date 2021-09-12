@@ -7,11 +7,40 @@ export interface ConnectionData {
   startNode: NodeData;
   endNode: NodeData;
   weight: number;
+  selected: boolean;
 }
 
 interface ConnectionProps {
   data: ConnectionData;
 }
+
+const getCenterX = (node: NodeData) => {
+  return node.xPosition + Constants.NODE_SIZE / 2;
+};
+
+const getCenterY = (node: NodeData) => {
+  return node.yPosition + Constants.NODE_SIZE / 2;
+};
+
+export const checkIfPointOnConnectionLine = (
+  connectionData: ConnectionData,
+  xPosition: number,
+  yPosition: number
+): boolean => {
+  const gradient =
+    (getCenterY(connectionData.startNode) -
+      getCenterY(connectionData.endNode)) /
+    (getCenterX(connectionData.startNode) - getCenterX(connectionData.endNode));
+  const yIntercept =
+    getCenterY(connectionData.startNode) -
+    gradient * getCenterX(connectionData.startNode);
+
+  const expectedYPosition = gradient * xPosition + yIntercept;
+  return (
+    yPosition <= expectedYPosition + Constants.CONNECTION_WIDTH &&
+    yPosition >= expectedYPosition - Constants.CONNECTION_WIDTH
+  );
+};
 
 const Connection = (connectionProps: ConnectionProps) => {
   const getNodeCenterPosition = (position: number): number => {
@@ -54,7 +83,11 @@ const Connection = (connectionProps: ConnectionProps) => {
   };
 
   return (
-    <div id="connection" style={positionStyle}>
+    <div
+      id="connection"
+      className={connectionProps.data.selected ? 'selected' : 'not-selected'}
+      style={positionStyle}
+    >
       <span id="weightDisplay">{connectionProps.data.weight}</span>
     </div>
   );

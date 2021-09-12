@@ -6,9 +6,14 @@
   padding: 20px;
 }
 
+#heading {
+  user-select: none;
+}
+
 .formLabel {
   margin-right: 10px;
   font-size: 20px;
+  user-select: none;
 }
 
 .formSubheading {
@@ -17,11 +22,13 @@
   font-size: 22px;
   padding-left: 20px;
   margin-top: 20px;
+  user-select: none;
 }
 
 .leftAligned {
   text-align: left;
   padding-left: 20px;
+  user-select: none;
 }
 
 .formInput {
