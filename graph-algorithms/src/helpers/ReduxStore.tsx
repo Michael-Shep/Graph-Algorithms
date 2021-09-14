@@ -5,7 +5,7 @@ import Constants from './Constants';
 export interface ConnectionIndexData {
   startNodeIndex: number;
   endNodeIndex: number;
-  weight: number;
+  weight: string;
   selected: boolean;
 }
 
@@ -167,6 +167,26 @@ const doesConnectionAlreadyExist = (
   return connectionExists;
 };
 
+const handleUpdateConnectionWeight = (state: NodeState, action: NodeAction) => {
+  if (state.selectedConnectionIndex === -1 || action.newValue === undefined) {
+    return state;
+  }
+
+  return {
+    nodes: state.nodes,
+    connectionsData: [
+      ...state.connectionsData.slice(0, state.selectedConnectionIndex),
+      {
+        ...state.connectionsData[state.selectedConnectionIndex],
+        weight: action.newValue!,
+      },
+      ...state.connectionsData.slice(state.selectedConnectionIndex + 1),
+    ],
+    selectedNodeIndex: state.selectedNodeIndex,
+    selectedConnectionIndex: state.selectedConnectionIndex,
+  };
+};
+
 const handleAddConnection = (
   state: NodeState,
   action: NodeAction
@@ -188,7 +208,7 @@ const handleAddConnection = (
       {
         startNodeIndex: action.startNodeIndex!,
         endNodeIndex: action.endNodeIndex!,
-        weight: 0,
+        weight: '0',
         selected: false,
       },
     ]),
@@ -238,7 +258,7 @@ const handleSelectConnection = (
     nodes: newNodes === undefined ? state.nodes : newNodes,
     connectionsData: newConnectionData,
     selectedNodeIndex: -1,
-    selectedConnectionIndex: state.selectedConnectionIndex,
+    selectedConnectionIndex: newlySelected ? action.connectionIndex! : -1,
   };
 };
 
@@ -268,6 +288,21 @@ const handleDeleteNode = (state: NodeState): NodeState => {
   };
 };
 
+const handleDeleteConnection = (state: NodeState): NodeState => {
+  if (state.selectedConnectionIndex === -1) {
+    return state;
+  }
+
+  return {
+    nodes: state.nodes,
+    connectionsData: state.connectionsData.filter(
+      (_, index) => index !== state.selectedConnectionIndex
+    ),
+    selectedNodeIndex: state.selectedNodeIndex,
+    selectedConnectionIndex: -1,
+  };
+};
+
 const reducer = (
   state: NodeState = initialState,
   action: NodeAction
@@ -287,6 +322,10 @@ const reducer = (
       return handleAddConnection(state, action);
     case 'SELECT-CONNECTION':
       return handleSelectConnection(state, action);
+    case 'UPDATE-CONNECTION-WEIGHT':
+      return handleUpdateConnectionWeight(state, action);
+    case 'DELETE-CONNECTION':
+      return handleDeleteConnection(state);
     default:
       return state;
   }

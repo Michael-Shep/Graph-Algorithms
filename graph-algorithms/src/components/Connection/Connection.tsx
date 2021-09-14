@@ -6,7 +6,7 @@ import Constants from '../../helpers/Constants';
 export interface ConnectionData {
   startNode: NodeData;
   endNode: NodeData;
-  weight: number;
+  weight: string;
   selected: boolean;
 }
 

@@ -11,23 +11,36 @@ interface InformationPanelProps {
   nodes: NodeData[];
   connectionsData: ConnectionIndexData[];
   selectedNodeIndex: number;
+  selectedConnectionIndex: number;
 }
 
 const InformationPanel = (props: InformationPanelProps) => {
   const getTitleText = () => {
     if (props.selectedNodeIndex !== -1) {
       return 'Node ' + props.selectedNodeIndex;
+    } else if (props.selectedConnectionIndex !== -1) {
+      return 'Connection ' + props.selectedConnectionIndex;
     } else {
       return 'Information Panel';
     }
   };
 
-  const handleValueChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleValueChange = (
+    event: ChangeEvent<HTMLInputElement>,
+    isNodeEvent: boolean
+  ) => {
     if (event.target.value !== undefined) {
-      store.dispatch({
-        type: 'UPDATE-NODE-VALUE',
-        newValue: event.target.value!,
-      });
+      if (isNodeEvent) {
+        store.dispatch({
+          type: 'UPDATE-NODE-VALUE',
+          newValue: event.target.value!,
+        });
+      } else {
+        store.dispatch({
+          type: 'UPDATE-CONNECTION-WEIGHT',
+          newValue: event.target.value!,
+        });
+      }
     }
   };
 
@@ -63,32 +76,90 @@ const InformationPanel = (props: InformationPanelProps) => {
     });
   };
 
-  const deleteButtonHandler = (event: MouseEvent<HTMLButtonElement>) => {
+  const deleteButtonHandler = (
+    event: MouseEvent<HTMLButtonElement>,
+    isNodeEvent: boolean
+  ) => {
     event.preventDefault();
-    store.dispatch({ type: 'DELETE-NODE' });
+    if (isNodeEvent) {
+      store.dispatch({ type: 'DELETE-NODE' });
+    } else {
+      store.dispatch({ type: 'DELETE-CONNECTION' });
+    }
+  };
+
+  const getNodeInformationBody = () => {
+    return (
+      <form>
+        <label className="formLabel">Value:</label>
+        <input
+          className="formInput"
+          type="text"
+          value={props.nodes[props.selectedNodeIndex].value}
+          onChange={(event) => handleValueChange(event, true)}
+        />
+        <p className="formSubheading">Connections:</p>
+        {listConnectionsForNode()}
+        <button
+          className="formButtonStyle"
+          onClick={(event) => deleteButtonHandler(event, true)}
+        >
+          Delete Node
+        </button>
+      </form>
+    );
+  };
+
+  const getConnectionInformationBody = () => {
+    return (
+      <form>
+        <label className="formLabel">Weight:</label>
+        <input
+          className="formInput"
+          type="text"
+          value={props.connectionsData[props.selectedConnectionIndex].weight}
+          onChange={(event) => handleValueChange(event, false)}
+        />
+        <p className="formSubheading">Nodes:</p>
+        <p className="leftAligned">
+          Start Node: Node With Value{' '}
+          {
+            props.nodes[
+              props.connectionsData[props.selectedConnectionIndex]
+                .startNodeIndex
+            ].value
+          }
+        </p>
+        <p className="leftAligned">
+          End Node: Node With Value{' '}
+          {
+            props.nodes[
+              props.connectionsData[props.selectedConnectionIndex].endNodeIndex
+            ].value
+          }
+        </p>
+        <button
+          className="formButtonStyle"
+          onClick={(event) => deleteButtonHandler(event, false)}
+        >
+          Delete Connection
+        </button>
+      </form>
+    );
   };
 
   const getBody = () => {
-    if (props.selectedNodeIndex === -1) {
+    if (
+      props.selectedNodeIndex === -1 &&
+      props.selectedConnectionIndex === -1
+    ) {
       return <div> Select a node to view and modify its information here</div>;
     }
 
     return (
       <div>
-        <form>
-          <label className="formLabel">Value:</label>
-          <input
-            className="formInput"
-            type="text"
-            value={props.nodes[props.selectedNodeIndex].value}
-            onChange={handleValueChange}
-          />
-          <p className="formSubheading">Connections:</p>
-          {listConnectionsForNode()}
-          <button className="formButtonStyle" onClick={deleteButtonHandler}>
-            Delete Node
-          </button>
-        </form>
+        {props.selectedNodeIndex !== -1 && getNodeInformationBody()}
+        {props.selectedConnectionIndex !== -1 && getConnectionInformationBody()}
       </div>
     );
   };
@@ -105,6 +176,7 @@ const mapStateToProps = (state: NodeState) => ({
   nodes: state.nodes,
   connectionsData: state.connectionsData,
   selectedNodeIndex: state.selectedNodeIndex,
+  selectedConnectionIndex: state.selectedConnectionIndex,
 });
 
 export default connect(mapStateToProps)(InformationPanel);
