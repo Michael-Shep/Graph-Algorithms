@@ -4,7 +4,7 @@ import { NodeData } from '../Node/Node';
 import { connect } from 'react-redux';
 import store, {
   ConnectionIndexData,
-  NodeState,
+  GraphState,
 } from '../../helpers/ReduxStore';
 
 interface InformationPanelProps {
@@ -172,7 +172,7 @@ const InformationPanel = (props: InformationPanelProps) => {
   );
 };
 
-const mapStateToProps = (state: NodeState) => ({
+const mapStateToProps = (state: GraphState) => ({
   nodes: state.nodes,
   connectionsData: state.connectionsData,
   selectedNodeIndex: state.selectedNodeIndex,

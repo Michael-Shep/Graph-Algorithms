@@ -8,7 +8,7 @@ import Connection, {
 } from '../Connection/Connection';
 import store, {
   ConnectionIndexData,
-  NodeState,
+  GraphState,
 } from '../../helpers/ReduxStore';
 import Constants from '../../helpers/Constants';
 import InformationPanel from '../InformationPanel/InformationPanel';
@@ -195,7 +195,7 @@ const App = (props: AppProps) => {
   );
 };
 
-const mapStateToProps = (state: NodeState) => ({
+const mapStateToProps = (state: GraphState) => ({
   nodes: state.nodes,
   connectionsData: state.connectionsData,
   selectedNodeIndex: state.selectedNodeIndex,
