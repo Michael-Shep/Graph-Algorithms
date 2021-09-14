@@ -12,6 +12,7 @@ import store, {
 } from '../../helpers/ReduxStore';
 import Constants from '../../helpers/Constants';
 import InformationPanel from '../InformationPanel/InformationPanel';
+import AlgorithmSelectionPopup from '../AlogrithmSelectionPopup/AlgorithmSelectionPopup';
 
 interface AppProps {
   nodes: NodeData[];
@@ -40,6 +41,7 @@ const App = (props: AppProps) => {
     useState<number>(-1);
 
   const [isMouseOnNode, setIsMouseOnNode] = useState(false);
+  const [selectionPopupVisible, setSelectionPopupVisible] = useState(false);
 
   useEffect(() => {
     if (interactionMode === InteractionMode.SELECTION) {
@@ -84,7 +86,6 @@ const App = (props: AppProps) => {
     if (graphDisplay.current === undefined) {
       return false;
     }
-    console.log('Checking Bounds');
 
     const boundingRect = graphDisplay.current!.getBoundingClientRect();
     return (
@@ -154,7 +155,7 @@ const App = (props: AppProps) => {
   };
 
   const runButtonHandler = () => {
-    console.log('RUN ALGORITHM');
+    setSelectionPopupVisible(true);
   };
 
   const addButtonHandler = () => {
@@ -213,6 +214,7 @@ const App = (props: AppProps) => {
           ))}
         </div>
         <InformationPanel />
+        <AlgorithmSelectionPopup visible={selectionPopupVisible} />
       </div>
     </div>
   );
