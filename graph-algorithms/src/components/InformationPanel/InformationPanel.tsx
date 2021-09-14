@@ -97,6 +97,7 @@ const InformationPanel = (props: InformationPanelProps) => {
           type="text"
           value={props.nodes[props.selectedNodeIndex].value}
           onChange={(event) => handleValueChange(event, true)}
+          onKeyDown={(event) => event.key === 'Enter' && event.preventDefault()}
         />
         <p className="formSubheading">Connections:</p>
         {listConnectionsForNode()}
@@ -119,6 +120,7 @@ const InformationPanel = (props: InformationPanelProps) => {
           type="text"
           value={props.connectionsData[props.selectedConnectionIndex].weight}
           onChange={(event) => handleValueChange(event, false)}
+          onKeyDown={(event) => event.key === 'Enter' && event.preventDefault()}
         />
         <p className="formSubheading">Nodes:</p>
         <p className="leftAligned">

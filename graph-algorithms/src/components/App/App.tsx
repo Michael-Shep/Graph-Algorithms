@@ -52,7 +52,10 @@ const App = (props: AppProps) => {
   }, [interactionMode]);
 
   const handleMouseMove = (mouseEvent: MouseEvent) => {
-    if (isMouseOnNode) {
+    if (
+      isMouseOnNode &&
+      isMouseInGraphAreaBounds(mouseEvent.pageX, mouseEvent.pageY)
+    ) {
       store.dispatch({
         type: 'MOVE-NODE',
         xPosition: mouseEvent.pageX,
@@ -74,59 +77,79 @@ const App = (props: AppProps) => {
     );
   };
 
+  const isMouseInGraphAreaBounds = (
+    clickX: number,
+    clickY: number
+  ): boolean => {
+    if (graphDisplay.current === undefined) {
+      return false;
+    }
+    console.log('Checking Bounds');
+
+    const boundingRect = graphDisplay.current!.getBoundingClientRect();
+    return (
+      clickX >= boundingRect.x + Constants.NODE_SIZE / 2 &&
+      clickX <= boundingRect.x + boundingRect.width - Constants.NODE_SIZE / 2 &&
+      clickY >= boundingRect.y + Constants.NODE_SIZE / 2 &&
+      clickY <= boundingRect.y + boundingRect.height - Constants.NODE_SIZE / 2
+    );
+  };
+
   const mouseDownHandler = (clickEvent: MouseEvent) => {
-    if (interactionMode === InteractionMode.SELECTION) {
-      let selectionMade = false;
-      props.nodes.forEach((node, index) => {
-        if (isMouseInNodeBounds(node, clickEvent.pageX, clickEvent.pageY)) {
-          setIsMouseOnNode(true);
-          store.dispatch({
-            type: 'SELECT-NODE',
-            nodeIndex: index,
-          });
-          selectionMade = true;
-          return;
-        }
-      });
-      if (!selectionMade) {
-        props.connectionsData.forEach((connectionIndexData, index) => {
-          if (
-            checkIfPointOnConnectionLine(
-              {
-                startNode: props.nodes[connectionIndexData.startNodeIndex],
-                endNode: props.nodes[connectionIndexData.endNodeIndex],
-                weight: connectionIndexData.weight,
-                selected: connectionIndexData.selected,
-              },
-              clickEvent.pageX,
-              clickEvent.pageY
-            )
-          ) {
+    if (isMouseInGraphAreaBounds(clickEvent.pageX, clickEvent.pageY)) {
+      if (interactionMode === InteractionMode.SELECTION) {
+        let selectionMade = false;
+        props.nodes.forEach((node, index) => {
+          if (isMouseInNodeBounds(node, clickEvent.pageX, clickEvent.pageY)) {
+            setIsMouseOnNode(true);
             store.dispatch({
-              type: 'SELECT-CONNECTION',
-              connectionIndex: index,
+              type: 'SELECT-NODE',
+              nodeIndex: index,
             });
+            selectionMade = true;
             return;
           }
         });
-      }
-    } else {
-      props.nodes.forEach((node, index) => {
-        if (isMouseInNodeBounds(node, clickEvent.pageX, clickEvent.pageY)) {
-          if (firstSelectedNodeIndex === -1) {
-            setInformationText(Constants.CONNECTION_END_NODE_TEXT);
-            setFirstSelectedNodeIndex(index);
-          } else if (index !== firstSelectedNodeIndex) {
-            store.dispatch({
-              type: 'ADD-CONNECTION',
-              startNodeIndex: firstSelectedNodeIndex,
-              endNodeIndex: index,
-            });
-            setFirstSelectedNodeIndex(-1);
-            setInteractionMode(InteractionMode.SELECTION);
-          }
+        if (!selectionMade) {
+          props.connectionsData.forEach((connectionIndexData, index) => {
+            if (
+              checkIfPointOnConnectionLine(
+                {
+                  startNode: props.nodes[connectionIndexData.startNodeIndex],
+                  endNode: props.nodes[connectionIndexData.endNodeIndex],
+                  weight: connectionIndexData.weight,
+                  selected: connectionIndexData.selected,
+                },
+                clickEvent.pageX,
+                clickEvent.pageY
+              )
+            ) {
+              store.dispatch({
+                type: 'SELECT-CONNECTION',
+                connectionIndex: index,
+              });
+              return;
+            }
+          });
         }
-      });
+      } else {
+        props.nodes.forEach((node, index) => {
+          if (isMouseInNodeBounds(node, clickEvent.pageX, clickEvent.pageY)) {
+            if (firstSelectedNodeIndex === -1) {
+              setInformationText(Constants.CONNECTION_END_NODE_TEXT);
+              setFirstSelectedNodeIndex(index);
+            } else if (index !== firstSelectedNodeIndex) {
+              store.dispatch({
+                type: 'ADD-CONNECTION',
+                startNodeIndex: firstSelectedNodeIndex,
+                endNodeIndex: index,
+              });
+              setFirstSelectedNodeIndex(-1);
+              setInteractionMode(InteractionMode.SELECTION);
+            }
+          }
+        });
+      }
     }
   };
 
