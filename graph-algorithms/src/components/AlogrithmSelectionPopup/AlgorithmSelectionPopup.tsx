@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { MouseEvent } from 'react';
 import useWindowSize, { Size } from '../../helpers/useWindowSize';
 import './AlgorithmSelectionPopup.css';
 import Constants from '../../helpers/Constants';
@@ -22,11 +22,29 @@ const AlgorithmSelectionPopup = (props: AlgorithmSelectionProps) => {
     return {};
   };
 
+  const handleButtonPress = (event: MouseEvent<HTMLButtonElement>) => {
+    console.log(event.currentTarget.value);
+  };
+
   return (
     <div>
       {props.visible && (
         <div id="popup" style={getPositionStyling()}>
           <h2>Select Algorithm to Perform</h2>
+          <button
+            className="optionButton"
+            value="dijkstra"
+            onClick={handleButtonPress}
+          >
+            Dijkstra&apos;s Search Algorithm
+          </button>
+          <button
+            className="optionButton"
+            value="astar"
+            onClick={handleButtonPress}
+          >
+            A* Search Algorithm
+          </button>
         </div>
       )}
     </div>

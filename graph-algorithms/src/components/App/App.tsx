@@ -1,11 +1,8 @@
-import React, { useState, useEffect, MouseEvent, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { connect } from 'react-redux';
 import './App.css';
 import Node, { NodeData } from '../Node/Node';
-import Connection, {
-  ConnectionData,
-  checkIfPointOnConnectionLine,
-} from '../Connection/Connection';
+import Connection, { ConnectionData } from '../Connection/Connection';
 import store, {
   ConnectionIndexData,
   GraphState,
@@ -13,6 +10,11 @@ import store, {
 import Constants from '../../helpers/Constants';
 import InformationPanel from '../InformationPanel/InformationPanel';
 import AlgorithmSelectionPopup from '../AlogrithmSelectionPopup/AlgorithmSelectionPopup';
+import useWindowSize, { Size } from '../../helpers/useWindowSize';
+import {
+  handleMouseMove,
+  mouseDownHandler,
+} from '../../helpers/MouseEventHandler';
 
 interface AppProps {
   nodes: NodeData[];
@@ -20,7 +22,7 @@ interface AppProps {
   selectedNodeIndex: number;
 }
 
-enum InteractionMode {
+export enum InteractionMode {
   SELECTION,
   NEW_CONNECTION,
 }
@@ -42,6 +44,7 @@ const App = (props: AppProps) => {
 
   const [isMouseOnNode, setIsMouseOnNode] = useState(false);
   const [selectionPopupVisible, setSelectionPopupVisible] = useState(false);
+  const size: Size = useWindowSize();
 
   useEffect(() => {
     if (interactionMode === InteractionMode.SELECTION) {
@@ -52,107 +55,6 @@ const App = (props: AppProps) => {
       setModeButtonText(Constants.CANCEL_CONNECTION_TEXT);
     }
   }, [interactionMode]);
-
-  const handleMouseMove = (mouseEvent: MouseEvent) => {
-    if (
-      isMouseOnNode &&
-      isMouseInGraphAreaBounds(mouseEvent.pageX, mouseEvent.pageY)
-    ) {
-      store.dispatch({
-        type: 'MOVE-NODE',
-        xPosition: mouseEvent.pageX,
-        yPosition: mouseEvent.pageY,
-      });
-    }
-  };
-
-  const isMouseInNodeBounds = (
-    node: NodeData,
-    clickX: number,
-    clickY: number
-  ): boolean => {
-    return (
-      node.xPosition <= clickX &&
-      node.xPosition + Constants.NODE_SIZE >= clickX &&
-      node.yPosition <= clickY &&
-      node.yPosition + Constants.NODE_SIZE >= clickY
-    );
-  };
-
-  const isMouseInGraphAreaBounds = (
-    clickX: number,
-    clickY: number
-  ): boolean => {
-    if (graphDisplay.current === undefined) {
-      return false;
-    }
-
-    const boundingRect = graphDisplay.current!.getBoundingClientRect();
-    return (
-      clickX >= boundingRect.x + Constants.NODE_SIZE / 2 &&
-      clickX <= boundingRect.x + boundingRect.width - Constants.NODE_SIZE / 2 &&
-      clickY >= boundingRect.y + Constants.NODE_SIZE / 2 &&
-      clickY <= boundingRect.y + boundingRect.height - Constants.NODE_SIZE / 2
-    );
-  };
-
-  const mouseDownHandler = (clickEvent: MouseEvent) => {
-    if (isMouseInGraphAreaBounds(clickEvent.pageX, clickEvent.pageY)) {
-      if (interactionMode === InteractionMode.SELECTION) {
-        let selectionMade = false;
-        props.nodes.forEach((node, index) => {
-          if (isMouseInNodeBounds(node, clickEvent.pageX, clickEvent.pageY)) {
-            setIsMouseOnNode(true);
-            store.dispatch({
-              type: 'SELECT-NODE',
-              nodeIndex: index,
-            });
-            selectionMade = true;
-            return;
-          }
-        });
-        if (!selectionMade) {
-          props.connectionsData.forEach((connectionIndexData, index) => {
-            if (
-              checkIfPointOnConnectionLine(
-                {
-                  startNode: props.nodes[connectionIndexData.startNodeIndex],
-                  endNode: props.nodes[connectionIndexData.endNodeIndex],
-                  weight: connectionIndexData.weight,
-                  selected: connectionIndexData.selected,
-                },
-                clickEvent.pageX,
-                clickEvent.pageY
-              )
-            ) {
-              store.dispatch({
-                type: 'SELECT-CONNECTION',
-                connectionIndex: index,
-              });
-              return;
-            }
-          });
-        }
-      } else {
-        props.nodes.forEach((node, index) => {
-          if (isMouseInNodeBounds(node, clickEvent.pageX, clickEvent.pageY)) {
-            if (firstSelectedNodeIndex === -1) {
-              setInformationText(Constants.CONNECTION_END_NODE_TEXT);
-              setFirstSelectedNodeIndex(index);
-            } else if (index !== firstSelectedNodeIndex) {
-              store.dispatch({
-                type: 'ADD-CONNECTION',
-                startNodeIndex: firstSelectedNodeIndex,
-                endNodeIndex: index,
-              });
-              setFirstSelectedNodeIndex(-1);
-              setInteractionMode(InteractionMode.SELECTION);
-            }
-          }
-        });
-      }
-    }
-  };
 
   const runButtonHandler = () => {
     setSelectionPopupVisible(true);
@@ -180,8 +82,31 @@ const App = (props: AppProps) => {
       <div id="body">
         <div
           id="graphDisplay"
-          onMouseMove={handleMouseMove}
-          onMouseDown={mouseDownHandler}
+          onMouseMove={(event) =>
+            handleMouseMove(
+              event,
+              selectionPopupVisible,
+              isMouseOnNode,
+              graphDisplay.current!
+            )
+          }
+          onMouseDown={(event) =>
+            mouseDownHandler(
+              event,
+              props.nodes,
+              props.connectionsData,
+              selectionPopupVisible,
+              interactionMode,
+              graphDisplay.current!,
+              firstSelectedNodeIndex,
+              size,
+              setIsMouseOnNode,
+              setInformationText,
+              setFirstSelectedNodeIndex,
+              setInteractionMode,
+              setSelectionPopupVisible
+            )
+          }
           onMouseUp={() => setIsMouseOnNode(false)}
           ref={graphDisplay}
         >
