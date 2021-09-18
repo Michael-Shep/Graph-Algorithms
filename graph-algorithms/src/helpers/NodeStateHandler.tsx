@@ -1,5 +1,6 @@
 import { GraphState, GraphAction, ConnectionIndexData } from './ReduxStore';
 import Constants from './Constants';
+import { NodeData } from '../components/Node/Node';
 
 export const handleSelectNode = (
   state: GraphState,
@@ -49,6 +50,33 @@ export const handleSelectNode = (
   };
 };
 
+export const handleSelectNodeForAlgorithm = (
+  state: GraphState,
+  action: GraphAction
+): GraphState => {
+  if (
+    action.nodeIndex === undefined ||
+    action.nodeIndex <= -1 ||
+    action.nodeIndex >= state.nodes.length
+  ) {
+    return state;
+  }
+
+  return {
+    nodes: [
+      ...state.nodes.slice(0, action.nodeIndex!),
+      {
+        ...state.nodes[action.nodeIndex!],
+        algorithmStartOrEndNode: true,
+      },
+      ...state.nodes.slice(action.nodeIndex! + 1),
+    ],
+    connectionsData: state.connectionsData,
+    selectedConnectionIndex: state.selectedConnectionIndex,
+    selectedNodeIndex: state.selectedNodeIndex,
+  };
+};
+
 export const handleAddNode = (state: GraphState): GraphState => {
   return {
     nodes: state.nodes.concat([
@@ -57,6 +85,7 @@ export const handleAddNode = (state: GraphState): GraphState => {
         yPosition: Constants.NEW_NODE_Y_POSITION,
         value: '0',
         selected: false,
+        algorithmStartOrEndNode: false,
       },
     ]),
     connectionsData: state.connectionsData,
@@ -139,5 +168,44 @@ export const handleDeleteNode = (state: GraphState): GraphState => {
     connectionsData: getConnectionsWithoutSelectedNode(state),
     selectedNodeIndex: -1,
     selectedConnectionIndex: state.selectedConnectionIndex,
+  };
+};
+
+export const clearAllSelections = (state: GraphState): GraphState => {
+  if (state.selectedConnectionIndex === -1 && state.selectedNodeIndex === -1) {
+    return state;
+  }
+
+  let newNodes: NodeData[] = [];
+  if (state.selectedNodeIndex !== -1) {
+    newNodes = [
+      ...state.nodes.slice(0, state.selectedNodeIndex),
+      {
+        ...state.nodes[state.selectedNodeIndex],
+        selected: false,
+      },
+      ...state.nodes.slice(state.selectedNodeIndex + 1),
+    ];
+  }
+
+  let newConnections: ConnectionIndexData[] = [];
+  if (state.selectedConnectionIndex !== -1) {
+    newConnections = [
+      ...state.connectionsData.slice(0, state.selectedConnectionIndex),
+      {
+        ...state.connectionsData[state.selectedConnectionIndex],
+        selected: false,
+      },
+      ...state.connectionsData.slice(state.selectedConnectionIndex + 1),
+    ];
+    console.log(newConnections);
+  }
+
+  return {
+    nodes: newNodes.length !== 0 ? newNodes : state.nodes,
+    connectionsData:
+      newConnections.length !== 0 ? newConnections : state.connectionsData,
+    selectedNodeIndex: -1,
+    selectedConnectionIndex: -1,
   };
 };

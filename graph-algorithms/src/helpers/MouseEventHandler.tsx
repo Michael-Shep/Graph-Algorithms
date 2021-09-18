@@ -227,7 +227,7 @@ export const mouseDownHandler = (
         connectionsData,
         setIsMouseOnNode
       );
-    } else {
+    } else if (interactionMode === InteractionMode.NEW_CONNECTION) {
       handleAddConnection(
         nodes,
         clickEvent,
@@ -236,6 +236,28 @@ export const mouseDownHandler = (
         setFirstSelectedNodeIndex,
         setInteractionMode
       );
+    } else if (interactionMode === InteractionMode.START_NODE_SELECTION) {
+      nodes.forEach((node, index) => {
+        if (
+          isMouseInNodeBounds(node, clickEvent.pageX, clickEvent.pageY) &&
+          !node.algorithmStartOrEndNode
+        ) {
+          store.dispatch({ type: 'SELECT-ALGORITHM-NODE', nodeIndex: index });
+          setInteractionMode(InteractionMode.END_NODE_SELECTION);
+          return;
+        }
+      });
+    } else if (interactionMode === InteractionMode.END_NODE_SELECTION) {
+      nodes.forEach((node, index) => {
+        if (
+          isMouseInNodeBounds(node, clickEvent.pageX, clickEvent.pageY) &&
+          !node.algorithmStartOrEndNode
+        ) {
+          store.dispatch({ type: 'SELECT-ALGORITHM-NODE', nodeIndex: index });
+          setInteractionMode(InteractionMode.SELECTION);
+          return;
+        }
+      });
     }
   } else {
     if (isMouseOutsidePopupWindow(clickEvent.pageX, clickEvent.pageY, size)) {

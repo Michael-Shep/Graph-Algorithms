@@ -25,6 +25,8 @@ interface AppProps {
 export enum InteractionMode {
   SELECTION,
   NEW_CONNECTION,
+  START_NODE_SELECTION,
+  END_NODE_SELECTION,
 }
 
 const App = (props: AppProps) => {
@@ -53,6 +55,10 @@ const App = (props: AppProps) => {
     } else if (interactionMode === InteractionMode.NEW_CONNECTION) {
       setInformationText(Constants.CONNECTION_START_NODE_TEXT);
       setModeButtonText(Constants.CANCEL_CONNECTION_TEXT);
+    } else if (interactionMode === InteractionMode.START_NODE_SELECTION) {
+      setInformationText(Constants.START_NODE_SELECTION_TEXT);
+    } else if (interactionMode === InteractionMode.END_NODE_SELECTION) {
+      setInformationText(Constants.END_NODE_SELECTION_TEXT);
     }
   }, [interactionMode]);
 
@@ -139,7 +145,11 @@ const App = (props: AppProps) => {
           ))}
         </div>
         <InformationPanel />
-        <AlgorithmSelectionPopup visible={selectionPopupVisible} />
+        <AlgorithmSelectionPopup
+          visible={selectionPopupVisible}
+          setSelectionPopupVisible={setSelectionPopupVisible}
+          setInteractionMode={setInteractionMode}
+        />
       </div>
     </div>
   );

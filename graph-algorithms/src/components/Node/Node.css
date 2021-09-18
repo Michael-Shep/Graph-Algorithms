@@ -15,6 +15,10 @@
   border: 3px solid black;
 }
 
+.start-or-end-algorithm-border {
+  border: 5px solid goldenrod;
+}
+
 #valueText {
   font-size: 30px;
   font-weight: 550;

@@ -6,6 +6,8 @@ import {
   handleMoveNode,
   handleUpdateNodeValue,
   handleDeleteNode,
+  clearAllSelections,
+  handleSelectNodeForAlgorithm,
 } from './NodeStateHandler';
 import {
   handleUpdateConnectionWeight,
@@ -41,8 +43,20 @@ export interface GraphAction {
 
 const initialState: GraphState = {
   nodes: [
-    { xPosition: 100, yPosition: 500, value: '1', selected: false },
-    { xPosition: 200, yPosition: 600, value: '2', selected: false },
+    {
+      xPosition: 100,
+      yPosition: 500,
+      value: '1',
+      selected: false,
+      algorithmStartOrEndNode: false,
+    },
+    {
+      xPosition: 200,
+      yPosition: 600,
+      value: '2',
+      selected: false,
+      algorithmStartOrEndNode: false,
+    },
   ],
   connectionsData: [],
   selectedNodeIndex: -1,
@@ -64,6 +78,8 @@ const reducer = (
       return handleUpdateNodeValue(state, action);
     case 'DELETE-NODE':
       return handleDeleteNode(state);
+    case 'SELECT-ALGORITHM-NODE':
+      return handleSelectNodeForAlgorithm(state, action);
     case 'ADD-CONNECTION':
       return handleAddConnection(state, action);
     case 'SELECT-CONNECTION':
@@ -72,6 +88,8 @@ const reducer = (
       return handleUpdateConnectionWeight(state, action);
     case 'DELETE-CONNECTION':
       return handleDeleteConnection(state);
+    case 'CLEAR-SELECTIONS':
+      return clearAllSelections(state);
     default:
       return state;
   }

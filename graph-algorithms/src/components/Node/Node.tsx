@@ -7,6 +7,7 @@ export interface NodeData {
   yPosition: number;
   value: string;
   selected: boolean;
+  algorithmStartOrEndNode: boolean;
 }
 
 interface NodeProps {
@@ -21,12 +22,19 @@ const Node = (props: NodeProps) => {
     height: Constants.NODE_SIZE,
   };
 
+  const getBorderClassForNode = (): string => {
+    if (props.nodeData.selected) {
+      return 'active-border';
+    }
+    if (props.nodeData.algorithmStartOrEndNode) {
+      return 'start-or-end-algorithm-border';
+    }
+
+    return 'standard-border';
+  };
+
   return (
-    <div
-      id="node"
-      className={props.nodeData.selected ? 'active-border' : 'standard-border'}
-      style={positionStyle}
-    >
+    <div id="node" className={getBorderClassForNode()} style={positionStyle}>
       <span id="valueText">{props.nodeData.value}</span>
     </div>
   );
