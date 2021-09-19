@@ -27,6 +27,7 @@ export enum InteractionMode {
   NEW_CONNECTION,
   START_NODE_SELECTION,
   END_NODE_SELECTION,
+  ALGORITHM,
 }
 
 const App = (props: AppProps) => {
@@ -59,21 +60,36 @@ const App = (props: AppProps) => {
       setInformationText(Constants.START_NODE_SELECTION_TEXT);
     } else if (interactionMode === InteractionMode.END_NODE_SELECTION) {
       setInformationText(Constants.END_NODE_SELECTION_TEXT);
+    } else if (interactionMode === InteractionMode.ALGORITHM) {
+      setInformationText(Constants.ALGORITHM_MODE_TEXT);
+      setModeButtonText(Constants.ALGORITHM_COMPLETE_BUTTON_TEXT);
     }
   }, [interactionMode]);
 
-  const runButtonHandler = () => {
-    setSelectionPopupVisible(true);
+  const runCancelButtonHandler = () => {
+    if (interactionMode !== InteractionMode.ALGORITHM) {
+      setSelectionPopupVisible(true);
+    } else {
+      console.log('Cancel Algorithm');
+    }
   };
 
-  const addButtonHandler = () => {
-    store.dispatch({ type: 'ADD-NODE' });
+  const addStepButtonHandler = () => {
+    if (interactionMode !== InteractionMode.ALGORITHM) {
+      store.dispatch({ type: 'ADD-NODE' });
+    } else {
+      console.log('Perform Step of Alogrithm');
+    }
   };
 
-  const modeButtonHandler = () => {
+  const modeSkipButtonHandler = () => {
     if (interactionMode === InteractionMode.SELECTION) {
       setInteractionMode(InteractionMode.NEW_CONNECTION);
-    } else setInteractionMode(InteractionMode.SELECTION);
+    } else if (interactionMode === InteractionMode.NEW_CONNECTION) {
+      setInteractionMode(InteractionMode.SELECTION);
+    } else if (interactionMode === InteractionMode.ALGORITHM) {
+      console.log('Skip to end of alogrithm');
+    }
   };
 
   const isValidNodeIndex = (index: number): boolean => {
@@ -116,14 +132,18 @@ const App = (props: AppProps) => {
           onMouseUp={() => setIsMouseOnNode(false)}
           ref={graphDisplay}
         >
-          <button onClick={addButtonHandler} className="buttonStyle">
-            Add Node
+          <button onClick={addStepButtonHandler} className="buttonStyle">
+            {interactionMode === InteractionMode.ALGORITHM
+              ? 'Perform Step'
+              : 'Add Node'}
           </button>
-          <button onClick={modeButtonHandler} className="buttonStyle">
+          <button onClick={modeSkipButtonHandler} className="buttonStyle">
             {modeButtonText}
           </button>
-          <button onClick={runButtonHandler} className="buttonStyle">
-            Run Algorithm
+          <button onClick={runCancelButtonHandler} className="buttonStyle">
+            {interactionMode === InteractionMode.ALGORITHM
+              ? 'Cancel Algorithm'
+              : 'Run Algorithm'}
           </button>
           <p id="informationText">{informationText}</p>
           {props.connectionsData.map((connectionIndexData, index) => {

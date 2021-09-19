@@ -185,6 +185,28 @@ const handleAddConnection = (
   });
 };
 
+const algorithmNodeSelection = (
+  nodes: NodeData[],
+  clickEvent: MouseEvent,
+  setInteractionMode: (value: InteractionMode) => void,
+  startNode: boolean
+) => {
+  nodes.forEach((node, index) => {
+    if (
+      isMouseInNodeBounds(node, clickEvent.pageX, clickEvent.pageY) &&
+      !node.algorithmStartOrEndNode
+    ) {
+      store.dispatch({ type: 'SELECT-ALGORITHM-NODE', nodeIndex: index });
+      if (startNode) {
+        setInteractionMode(InteractionMode.END_NODE_SELECTION);
+      } else {
+        setInteractionMode(InteractionMode.ALGORITHM);
+      }
+      return;
+    }
+  });
+};
+
 /**
  * Handles whenever the a mouse button is clicked
  * @param clickEvent The mouse event that occurred
@@ -237,27 +259,9 @@ export const mouseDownHandler = (
         setInteractionMode
       );
     } else if (interactionMode === InteractionMode.START_NODE_SELECTION) {
-      nodes.forEach((node, index) => {
-        if (
-          isMouseInNodeBounds(node, clickEvent.pageX, clickEvent.pageY) &&
-          !node.algorithmStartOrEndNode
-        ) {
-          store.dispatch({ type: 'SELECT-ALGORITHM-NODE', nodeIndex: index });
-          setInteractionMode(InteractionMode.END_NODE_SELECTION);
-          return;
-        }
-      });
+      algorithmNodeSelection(nodes, clickEvent, setInteractionMode, true);
     } else if (interactionMode === InteractionMode.END_NODE_SELECTION) {
-      nodes.forEach((node, index) => {
-        if (
-          isMouseInNodeBounds(node, clickEvent.pageX, clickEvent.pageY) &&
-          !node.algorithmStartOrEndNode
-        ) {
-          store.dispatch({ type: 'SELECT-ALGORITHM-NODE', nodeIndex: index });
-          setInteractionMode(InteractionMode.SELECTION);
-          return;
-        }
-      });
+      algorithmNodeSelection(nodes, clickEvent, setInteractionMode, false);
     }
   } else {
     if (isMouseOutsidePopupWindow(clickEvent.pageX, clickEvent.pageY, size)) {
