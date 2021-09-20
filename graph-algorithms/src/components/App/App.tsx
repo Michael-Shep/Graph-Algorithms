@@ -15,6 +15,7 @@ import {
   handleMouseMove,
   mouseDownHandler,
 } from '../../helpers/MouseEventHandler';
+import { currentAlgorithm } from '../../helpers/Algorithm';
 
 interface AppProps {
   nodes: NodeData[];
@@ -70,7 +71,8 @@ const App = (props: AppProps) => {
     if (interactionMode !== InteractionMode.ALGORITHM) {
       setSelectionPopupVisible(true);
     } else {
-      console.log('Cancel Algorithm');
+      store.dispatch({ type: 'CLEAR-SELECTIONS' });
+      setInteractionMode(InteractionMode.SELECTION);
     }
   };
 
@@ -78,7 +80,7 @@ const App = (props: AppProps) => {
     if (interactionMode !== InteractionMode.ALGORITHM) {
       store.dispatch({ type: 'ADD-NODE' });
     } else {
-      console.log('Perform Step of Alogrithm');
+      currentAlgorithm.performStep();
     }
   };
 

@@ -172,20 +172,13 @@ export const handleDeleteNode = (state: GraphState): GraphState => {
 };
 
 export const clearAllSelections = (state: GraphState): GraphState => {
-  if (state.selectedConnectionIndex === -1 && state.selectedNodeIndex === -1) {
-    return state;
+  const newNodes: NodeData[] = [...state.nodes];
+  if (state.selectedNodeIndex !== -1) {
+    newNodes[state.selectedNodeIndex].selected = false;
   }
 
-  let newNodes: NodeData[] = [];
-  if (state.selectedNodeIndex !== -1) {
-    newNodes = [
-      ...state.nodes.slice(0, state.selectedNodeIndex),
-      {
-        ...state.nodes[state.selectedNodeIndex],
-        selected: false,
-      },
-      ...state.nodes.slice(state.selectedNodeIndex + 1),
-    ];
+  for (let i = 0; i < newNodes.length; i++) {
+    newNodes[i].algorithmStartOrEndNode = false;
   }
 
   let newConnections: ConnectionIndexData[] = [];
@@ -198,11 +191,10 @@ export const clearAllSelections = (state: GraphState): GraphState => {
       },
       ...state.connectionsData.slice(state.selectedConnectionIndex + 1),
     ];
-    console.log(newConnections);
   }
 
   return {
-    nodes: newNodes.length !== 0 ? newNodes : state.nodes,
+    nodes: newNodes,
     connectionsData:
       newConnections.length !== 0 ? newConnections : state.connectionsData,
     selectedNodeIndex: -1,

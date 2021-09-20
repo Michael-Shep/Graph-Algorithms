@@ -1,15 +1,22 @@
 import React, { MouseEvent } from 'react';
 import useWindowSize, { Size } from '../../helpers/useWindowSize';
+import { connect } from 'react-redux';
 import './AlgorithmSelectionPopup.css';
 import Constants from '../../helpers/Constants';
 import { AlgorithmType, currentAlgorithm } from '../../helpers/Algorithm';
 import { InteractionMode } from '../App/App';
-import store from '../../helpers/ReduxStore';
+import store, {
+  GraphState,
+  ConnectionIndexData,
+} from '../../helpers/ReduxStore';
+import { NodeData } from '../Node/Node';
 
 interface AlgorithmSelectionProps {
   visible: boolean;
   setSelectionPopupVisible: (value: boolean) => void;
   setInteractionMode: (value: InteractionMode) => void;
+  nodes: NodeData[];
+  connectionsData: ConnectionIndexData[];
 }
 
 const AlgorithmSelectionPopup = (props: AlgorithmSelectionProps) => {
@@ -28,7 +35,12 @@ const AlgorithmSelectionPopup = (props: AlgorithmSelectionProps) => {
   };
 
   const handleButtonPress = (event: MouseEvent<HTMLButtonElement>) => {
-    currentAlgorithm.startNewAlogrithm(AlgorithmType.DIJKSTRAS);
+    currentAlgorithm.startNewAlogrithm(
+      AlgorithmType.DIJKSTRAS,
+      0,
+      props.nodes,
+      props.connectionsData
+    );
     props.setSelectionPopupVisible(false);
     props.setInteractionMode(InteractionMode.START_NODE_SELECTION);
     store.dispatch({ type: 'CLEAR-SELECTIONS' });
@@ -59,4 +71,9 @@ const AlgorithmSelectionPopup = (props: AlgorithmSelectionProps) => {
   );
 };
 
-export default AlgorithmSelectionPopup;
+const mapStateToProps = (state: GraphState) => ({
+  nodes: state.nodes,
+  connectionsData: state.connectionsData,
+});
+
+export default connect(mapStateToProps)(AlgorithmSelectionPopup);
