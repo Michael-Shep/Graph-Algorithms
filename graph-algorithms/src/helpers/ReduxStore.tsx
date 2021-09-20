@@ -8,6 +8,7 @@ import {
   handleDeleteNode,
   clearAllSelections,
   handleSelectNodeForAlgorithm,
+  handleUpdateNodeDistance,
 } from './NodeStateHandler';
 import {
   handleUpdateConnectionWeight,
@@ -49,6 +50,7 @@ const initialState: GraphState = {
       value: '1',
       selected: false,
       algorithmStartOrEndNode: false,
+      distanceFromStartNode: -1,
     },
     {
       xPosition: 200,
@@ -56,6 +58,7 @@ const initialState: GraphState = {
       value: '2',
       selected: false,
       algorithmStartOrEndNode: false,
+      distanceFromStartNode: -1,
     },
   ],
   connectionsData: [],
@@ -76,6 +79,8 @@ const reducer = (
       return handleMoveNode(state, action);
     case 'UPDATE-NODE-VALUE':
       return handleUpdateNodeValue(state, action);
+    case 'UPDATE-NODE-DISTANCE':
+      return handleUpdateNodeDistance(state, action);
     case 'DELETE-NODE':
       return handleDeleteNode(state);
     case 'SELECT-ALGORITHM-NODE':

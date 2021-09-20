@@ -86,6 +86,7 @@ export const handleAddNode = (state: GraphState): GraphState => {
         value: '0',
         selected: false,
         algorithmStartOrEndNode: false,
+        distanceFromStartNode: -1,
       },
     ]),
     connectionsData: state.connectionsData,
@@ -145,6 +146,34 @@ export const handleUpdateNodeValue = (
   };
 };
 
+export const handleUpdateNodeDistance = (
+  state: GraphState,
+  action: GraphAction
+): GraphState => {
+  if (
+    action.nodeIndex === undefined ||
+    action.newValue === undefined ||
+    isNaN(+action.newValue)
+  ) {
+    return state;
+  }
+
+  return {
+    nodes: [
+      ...state.nodes.slice(0, action.nodeIndex!),
+      {
+        ...state.nodes[action.nodeIndex!],
+        distanceFromStartNode: Number(action.newValue!),
+        selected: true,
+      },
+      ...state.nodes.slice(action.nodeIndex! + 1),
+    ],
+    connectionsData: state.connectionsData,
+    selectedNodeIndex: action.nodeIndex!,
+    selectedConnectionIndex: state.selectedConnectionIndex,
+  };
+};
+
 const getConnectionsWithoutSelectedNode = (
   state: GraphState
 ): ConnectionIndexData[] => {
@@ -179,6 +208,7 @@ export const clearAllSelections = (state: GraphState): GraphState => {
 
   for (let i = 0; i < newNodes.length; i++) {
     newNodes[i].algorithmStartOrEndNode = false;
+    newNodes[i].distanceFromStartNode = -1;
   }
 
   let newConnections: ConnectionIndexData[] = [];

@@ -5,6 +5,7 @@ import { MouseEvent } from 'react';
 import store, { ConnectionIndexData } from '../helpers/ReduxStore';
 import { checkIfPointOnConnectionLine } from '../components/Connection/Connection';
 import { InteractionMode } from '../components/App/App';
+import { currentAlgorithm } from '../helpers/Algorithm';
 
 /**
  * Gets whether the mouse press occurred in the area where the graphs can be drawn
@@ -201,6 +202,7 @@ const algorithmNodeSelection = (
         setInteractionMode(InteractionMode.END_NODE_SELECTION);
       } else {
         setInteractionMode(InteractionMode.ALGORITHM);
+        currentAlgorithm.performStep();
       }
       return;
     }

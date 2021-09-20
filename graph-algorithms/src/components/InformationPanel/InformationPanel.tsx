@@ -6,6 +6,7 @@ import store, {
   ConnectionIndexData,
   GraphState,
 } from '../../helpers/ReduxStore';
+import { currentAlgorithm, AlgorithmType } from '../../helpers/Algorithm';
 
 interface InformationPanelProps {
   nodes: NodeData[];
@@ -150,7 +151,7 @@ const InformationPanel = (props: InformationPanelProps) => {
     );
   };
 
-  const getBody = () => {
+  const getSelectionBody = () => {
     if (
       props.selectedNodeIndex === -1 &&
       props.selectedConnectionIndex === -1
@@ -166,10 +167,42 @@ const InformationPanel = (props: InformationPanelProps) => {
     );
   };
 
+  const getAlgorithmBody = () => {
+    return (
+      <table className="tableStyle">
+        <thead>
+          <tr>
+            <th>Node</th>
+            <th>Distance From Start</th>
+          </tr>
+        </thead>
+        <tbody>
+          {props.nodes.map((node, index) => {
+            return (
+              <tr key={index + 'Row'}>
+                <td key={index + 'Data0'}>
+                  {index}: {node.value}
+                </td>
+                <td key={index + 'Data1'}>
+                  {node.distanceFromStartNode !== -1
+                    ? node.distanceFromStartNode
+                    : String.fromCodePoint(parseInt('0221E', 16))}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    );
+  };
+
   return (
     <div id="panel">
       <h1 id="heading">{getTitleText()}</h1>
-      {getBody()}
+      {currentAlgorithm.getAlgorithmType() === AlgorithmType.NONE &&
+        getSelectionBody()}
+      {currentAlgorithm.getAlgorithmType() !== AlgorithmType.NONE &&
+        getAlgorithmBody()}
     </div>
   );
 };

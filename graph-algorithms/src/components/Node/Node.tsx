@@ -8,6 +8,7 @@ export interface NodeData {
   value: string;
   selected: boolean;
   algorithmStartOrEndNode: boolean;
+  distanceFromStartNode: number;
 }
 
 interface NodeProps {
