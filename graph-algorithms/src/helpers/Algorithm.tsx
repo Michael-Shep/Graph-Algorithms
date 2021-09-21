@@ -56,6 +56,7 @@ export default class Algorithm {
         nodeIndex: this.currentNodeIndex,
         newValue: '0',
       });
+      this.nodes[this.currentNodeIndex].distanceFromStartNode = 0;
       this.initialStep = false;
     } else {
       const currentConnections = this.getOutgoingConnectionsForCurrentNode();
@@ -70,6 +71,10 @@ export default class Algorithm {
             this.nodes[this.currentNodeIndex].distanceFromStartNode +
             shortestConnection.weight,
         });
+        //Need to come up with a better solution than this for updating nodes - this should just be a temporary fix
+        this.nodes[shortestConnection.endNodeIndex].distanceFromStartNode =
+          Number(this.nodes[this.currentNodeIndex].distanceFromStartNode) +
+          Number(shortestConnection.weight);
         this.currentNodeIndex = shortestConnection.endNodeIndex;
       }
     }
@@ -86,6 +91,10 @@ export default class Algorithm {
     this.nodes = nodes;
     this.connections = connections;
     this.initialStep = true;
+  };
+
+  public stopCurrentAlgorithm = () => {
+    this.type = AlgorithmType.NONE;
   };
 
   public getAlgorithmType = (): AlgorithmType => {

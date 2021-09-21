@@ -158,16 +158,21 @@ export const handleUpdateNodeDistance = (
     return state;
   }
 
+  const newNodes = [
+    ...state.nodes.slice(0, action.nodeIndex!),
+    {
+      ...state.nodes[action.nodeIndex!],
+      distanceFromStartNode: Number(action.newValue!),
+      selected: true,
+    },
+    ...state.nodes.slice(action.nodeIndex! + 1),
+  ];
+  if (state.selectedNodeIndex !== -1) {
+    newNodes[state.selectedNodeIndex].selected = false;
+  }
+
   return {
-    nodes: [
-      ...state.nodes.slice(0, action.nodeIndex!),
-      {
-        ...state.nodes[action.nodeIndex!],
-        distanceFromStartNode: Number(action.newValue!),
-        selected: true,
-      },
-      ...state.nodes.slice(action.nodeIndex! + 1),
-    ],
+    nodes: newNodes,
     connectionsData: state.connectionsData,
     selectedNodeIndex: action.nodeIndex!,
     selectedConnectionIndex: state.selectedConnectionIndex,

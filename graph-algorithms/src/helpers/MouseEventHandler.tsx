@@ -190,6 +190,7 @@ const algorithmNodeSelection = (
   nodes: NodeData[],
   clickEvent: MouseEvent,
   setInteractionMode: (value: InteractionMode) => void,
+  setAlgorithmStartNodeIndex: (value: number) => void,
   startNode: boolean
 ) => {
   nodes.forEach((node, index) => {
@@ -200,6 +201,7 @@ const algorithmNodeSelection = (
       store.dispatch({ type: 'SELECT-ALGORITHM-NODE', nodeIndex: index });
       if (startNode) {
         setInteractionMode(InteractionMode.END_NODE_SELECTION);
+        setAlgorithmStartNodeIndex(index);
       } else {
         setInteractionMode(InteractionMode.ALGORITHM);
         currentAlgorithm.performStep();
@@ -224,6 +226,7 @@ const algorithmNodeSelection = (
  * @param setFirstSelectedNodeIndex Setter for the first node as part of a new connection
  * @param setInteractionMode Setter for the interaction mode of the system
  * @param setSelectionPopupVisible Setter for whether the alogrithm selection popup is currently visible
+ * @param setAlgorithmStartNodeIndex Setter for the start node of the selected algorithm
  */
 export const mouseDownHandler = (
   clickEvent: MouseEvent,
@@ -238,7 +241,8 @@ export const mouseDownHandler = (
   setInformationText: (value: string) => void,
   setFirstSelectedNodeIndex: (value: number) => void,
   setInteractionMode: (value: InteractionMode) => void,
-  setSelectionPopupVisible: (value: boolean) => void
+  setSelectionPopupVisible: (value: boolean) => void,
+  setAlgorithmStartNodeIndex: (value: number) => void
 ) => {
   if (
     !selectionPopupVisible &&
@@ -261,9 +265,21 @@ export const mouseDownHandler = (
         setInteractionMode
       );
     } else if (interactionMode === InteractionMode.START_NODE_SELECTION) {
-      algorithmNodeSelection(nodes, clickEvent, setInteractionMode, true);
+      algorithmNodeSelection(
+        nodes,
+        clickEvent,
+        setInteractionMode,
+        setAlgorithmStartNodeIndex,
+        true
+      );
     } else if (interactionMode === InteractionMode.END_NODE_SELECTION) {
-      algorithmNodeSelection(nodes, clickEvent, setInteractionMode, false);
+      algorithmNodeSelection(
+        nodes,
+        clickEvent,
+        setInteractionMode,
+        setAlgorithmStartNodeIndex,
+        false
+      );
     }
   } else {
     if (isMouseOutsidePopupWindow(clickEvent.pageX, clickEvent.pageY, size)) {

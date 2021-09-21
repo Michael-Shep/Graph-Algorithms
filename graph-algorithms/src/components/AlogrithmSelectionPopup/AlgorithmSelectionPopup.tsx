@@ -15,6 +15,7 @@ interface AlgorithmSelectionProps {
   visible: boolean;
   setSelectionPopupVisible: (value: boolean) => void;
   setInteractionMode: (value: InteractionMode) => void;
+  algorithmStartNodeIndex: number;
   nodes: NodeData[];
   connectionsData: ConnectionIndexData[];
 }
@@ -37,7 +38,7 @@ const AlgorithmSelectionPopup = (props: AlgorithmSelectionProps) => {
   const handleButtonPress = (event: MouseEvent<HTMLButtonElement>) => {
     currentAlgorithm.startNewAlogrithm(
       AlgorithmType.DIJKSTRAS,
-      0,
+      props.algorithmStartNodeIndex,
       props.nodes,
       props.connectionsData
     );

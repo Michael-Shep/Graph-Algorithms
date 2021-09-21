@@ -16,7 +16,17 @@ interface InformationPanelProps {
 }
 
 const InformationPanel = (props: InformationPanelProps) => {
+  const getAlgorithmNameString = () => {
+    const algorithmName = AlgorithmType[currentAlgorithm.getAlgorithmType()];
+    const formattedName =
+      algorithmName.slice(0, 1) + algorithmName.slice(1).toLowerCase();
+    return formattedName + ' Algorithm';
+  };
+
   const getTitleText = () => {
+    if (currentAlgorithm.getAlgorithmType() !== AlgorithmType.NONE) {
+      return getAlgorithmNameString();
+    }
     if (props.selectedNodeIndex !== -1) {
       return 'Node ' + props.selectedNodeIndex;
     } else if (props.selectedConnectionIndex !== -1) {

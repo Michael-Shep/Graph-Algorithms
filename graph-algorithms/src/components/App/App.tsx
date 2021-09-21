@@ -48,6 +48,7 @@ const App = (props: AppProps) => {
 
   const [isMouseOnNode, setIsMouseOnNode] = useState(false);
   const [selectionPopupVisible, setSelectionPopupVisible] = useState(false);
+  const [algorithmStartNodeIndex, setAlgorithmStartNodeIndex] = useState(0);
   const size: Size = useWindowSize();
 
   useEffect(() => {
@@ -73,6 +74,7 @@ const App = (props: AppProps) => {
     } else {
       store.dispatch({ type: 'CLEAR-SELECTIONS' });
       setInteractionMode(InteractionMode.SELECTION);
+      currentAlgorithm.stopCurrentAlgorithm();
     }
   };
 
@@ -128,7 +130,8 @@ const App = (props: AppProps) => {
               setInformationText,
               setFirstSelectedNodeIndex,
               setInteractionMode,
-              setSelectionPopupVisible
+              setSelectionPopupVisible,
+              setAlgorithmStartNodeIndex
             )
           }
           onMouseUp={() => setIsMouseOnNode(false)}
@@ -171,6 +174,7 @@ const App = (props: AppProps) => {
           visible={selectionPopupVisible}
           setSelectionPopupVisible={setSelectionPopupVisible}
           setInteractionMode={setInteractionMode}
+          algorithmStartNodeIndex={algorithmStartNodeIndex}
         />
       </div>
     </div>
