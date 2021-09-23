@@ -51,6 +51,7 @@ const initialState: GraphState = {
       selected: false,
       algorithmStartOrEndNode: false,
       distanceFromStartNode: -1,
+      visited: false,
     },
     {
       xPosition: 200,
@@ -59,6 +60,7 @@ const initialState: GraphState = {
       selected: false,
       algorithmStartOrEndNode: false,
       distanceFromStartNode: -1,
+      visited: false,
     },
   ],
   connectionsData: [],

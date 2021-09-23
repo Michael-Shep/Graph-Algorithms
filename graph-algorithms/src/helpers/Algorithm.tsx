@@ -30,9 +30,13 @@ export default class Algorithm {
     this.initialStep = true;
   }
 
-  private getOutgoingConnectionsForCurrentNode = () => {
+  private getConnectionsForCurrentNode = () => {
     return this.connections.filter(
-      (connection) => connection.startNodeIndex === this.currentNodeIndex
+      (connection) =>
+        (connection.startNodeIndex === this.currentNodeIndex &&
+          !this.nodes[connection.endNodeIndex].visited) ||
+        (connection.endNodeIndex === this.currentNodeIndex &&
+          !this.nodes[connection.endNodeIndex].visited)
     );
   };
 
@@ -59,22 +63,28 @@ export default class Algorithm {
       this.nodes[this.currentNodeIndex].distanceFromStartNode = 0;
       this.initialStep = false;
     } else {
-      const currentConnections = this.getOutgoingConnectionsForCurrentNode();
+      const currentConnections = this.getConnectionsForCurrentNode();
       if (currentConnections.length > 0) {
         const shortestConnection =
           this.getConnectionWithShortestDistance(currentConnections);
+        const newNodeIndex =
+          shortestConnection.startNodeIndex == this.currentNodeIndex
+            ? shortestConnection.endNodeIndex
+            : shortestConnection.startNodeIndex;
 
         store.dispatch({
           type: 'UPDATE-NODE-DISTANCE',
-          nodeIndex: shortestConnection.endNodeIndex,
-          newValue:
-            this.nodes[this.currentNodeIndex].distanceFromStartNode +
-            shortestConnection.weight,
+          nodeIndex: newNodeIndex,
+          newValue: String(
+            Number(this.nodes[this.currentNodeIndex].distanceFromStartNode) +
+              Number(shortestConnection.weight)
+          ),
         });
         //Need to come up with a better solution than this for updating nodes - this should just be a temporary fix
-        this.nodes[shortestConnection.endNodeIndex].distanceFromStartNode =
+        this.nodes[newNodeIndex].distanceFromStartNode =
           Number(this.nodes[this.currentNodeIndex].distanceFromStartNode) +
           Number(shortestConnection.weight);
+        this.nodes[newNodeIndex].visited = true;
         this.currentNodeIndex = shortestConnection.endNodeIndex;
       }
     }

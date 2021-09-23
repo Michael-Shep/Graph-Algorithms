@@ -19,6 +19,10 @@
   border: 5px solid goldenrod;
 }
 
+.visited-border {
+  border: 3px solid blue;
+}
+
 #valueText {
   font-size: 30px;
   font-weight: 550;

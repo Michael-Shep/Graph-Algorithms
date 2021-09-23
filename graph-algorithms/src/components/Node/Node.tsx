@@ -9,6 +9,7 @@ export interface NodeData {
   selected: boolean;
   algorithmStartOrEndNode: boolean;
   distanceFromStartNode: number;
+  visited: boolean;
 }
 
 interface NodeProps {
@@ -29,6 +30,10 @@ const Node = (props: NodeProps) => {
     }
     if (props.nodeData.algorithmStartOrEndNode) {
       return 'start-or-end-algorithm-border';
+    }
+
+    if (props.nodeData.visited) {
+      return 'visited-border';
     }
 
     return 'standard-border';

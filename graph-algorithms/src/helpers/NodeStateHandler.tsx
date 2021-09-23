@@ -87,6 +87,7 @@ export const handleAddNode = (state: GraphState): GraphState => {
         selected: false,
         algorithmStartOrEndNode: false,
         distanceFromStartNode: -1,
+        visited: false,
       },
     ]),
     connectionsData: state.connectionsData,
@@ -169,6 +170,7 @@ export const handleUpdateNodeDistance = (
   ];
   if (state.selectedNodeIndex !== -1) {
     newNodes[state.selectedNodeIndex].selected = false;
+    newNodes[state.selectedNodeIndex].visited = true;
   }
 
   return {
